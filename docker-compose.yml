@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: edumentor-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: edumentordb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: edumentor-redis
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    container_name: edumentor-backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgrespassword@postgres:5432/edumentordb"
+      REDIS_URL: "redis://redis:6379/0"
+      LLM_PROVIDER: "mock"
+      SECRET_KEY: "production-ready-edumentor-secret-key-change-me"
+      DEBUG: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/storage:/app/storage
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: edumentor-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
