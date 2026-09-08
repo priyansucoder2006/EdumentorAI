@@ -15,6 +15,21 @@ import {
   BookOpen,
 } from 'lucide-react';
 
+const normalizeOptions = (opts: any): string[] => {
+  if (!opts) return [];
+  if (Array.isArray(opts)) return opts;
+  if (typeof opts === 'string') {
+    try {
+      const parsed = JSON.parse(opts);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+    if (opts.includes('\n')) return opts.split('\n').map((s: string) => s.trim()).filter(Boolean);
+    if (opts.includes('  ')) return opts.split(/\s{2,}/).map((s: string) => s.trim()).filter(Boolean);
+    return [opts];
+  }
+  return [];
+};
+
 export const AssessmentPage: React.FC = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
   const navigate = useNavigate();
@@ -98,42 +113,45 @@ export const AssessmentPage: React.FC = () => {
           </div>
 
           <div className="questions-stack">
-            {questions.map((q, idx) => (
-              <div key={q.id || idx} className="question-item-card">
-                <div className="q-number-bar">
-                  <span className="q-index">Question {idx + 1} of {questions.length}</span>
-                  <span className="q-concept-tag">{q.concept}</span>
-                </div>
-                <h4 className="q-prompt">{q.prompt}</h4>
-
-                {q.options && q.options.length > 0 ? (
-                  <div className="q-options-grid">
-                    {q.options.map((opt, optIdx) => {
-                      const isSelected = userAnswers[q.id] === opt;
-                      return (
-                        <button
-                          key={optIdx}
-                          type="button"
-                          className={`q-opt-btn ${isSelected ? 'selected' : ''}`}
-                          onClick={() => handleSelectAnswer(q.id, opt)}
-                        >
-                          <span className="opt-letter">{String.fromCharCode(65 + optIdx)}</span>
-                          <span className="opt-text">{opt}</span>
-                        </button>
-                      );
-                    })}
+            {questions.map((q, idx) => {
+              const qOpts = normalizeOptions(q.options);
+              return (
+                <div key={q.id || idx} className="question-item-card">
+                  <div className="q-number-bar">
+                    <span className="q-index">Question {idx + 1} of {questions.length}</span>
+                    <span className="q-concept-tag">{q.concept}</span>
                   </div>
-                ) : (
-                  <input
-                    type="text"
-                    className="q-text-input"
-                    placeholder="Enter your concise answer..."
-                    value={userAnswers[q.id] || ''}
-                    onChange={(e) => handleSelectAnswer(q.id, e.target.value)}
-                  />
-                )}
-              </div>
-            ))}
+                  <h4 className="q-prompt">{q.prompt}</h4>
+
+                  {qOpts.length > 0 ? (
+                    <div className="q-options-grid">
+                      {qOpts.map((opt, optIdx) => {
+                        const isSelected = userAnswers[q.id] === opt;
+                        return (
+                          <button
+                            key={optIdx}
+                            type="button"
+                            className={`q-opt-btn ${isSelected ? 'selected' : ''}`}
+                            onClick={() => handleSelectAnswer(q.id, opt)}
+                          >
+                            <span className="opt-letter">{String.fromCharCode(65 + optIdx)}</span>
+                            <span className="opt-text">{opt}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      className="q-text-input"
+                      placeholder="Enter your concise answer..."
+                      value={userAnswers[q.id] || ''}
+                      onChange={(e) => handleSelectAnswer(q.id, e.target.value)}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           <div className="quiz-submit-bar">

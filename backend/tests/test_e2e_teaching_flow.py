@@ -68,7 +68,7 @@ def test_critical_e2e_teaching_scenario(client, auth_headers):
     
     # Step 6: Verify Evaluation & Adaptive Decision
     assert interaction1["evaluation"] is not None
-    assert interaction1["adaptive_decision"]["action"] in ["reteach", "provide_analogy", "continue"]
+    assert interaction1["adaptive_decision"]["action"] in ["reteach", "provide_analogy", "give_analogy", "give_example", "simplify", "continue"]
     assert interaction1["adaptive_decision"]["remedial_explanation"] is not None
 
     # Step 7: Submit follow-up answer
@@ -81,7 +81,7 @@ def test_critical_e2e_teaching_scenario(client, auth_headers):
     assert interaction2_res.status_code == 200
     interaction2 = interaction2_res.json()
     assert interaction2["evaluation"] is not None
-    assert interaction2["adaptive_decision"]["action"] in ["continue", "increase_difficulty", "provide_analogy", "reteach"]
+    assert interaction2["adaptive_decision"]["action"] in ["continue", "increase_difficulty", "provide_analogy", "give_analogy", "give_example", "reteach"]
 
     # Step 8: Advance to Next Step
     next_step_res = client.post(

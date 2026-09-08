@@ -55,11 +55,11 @@ def client(db_session):
 
 
 @pytest.fixture(scope="function")
-def auth_headers(client, db_session):
-    # Create or fetch test user
+def test_user(db_session):
     user = db_session.query(User).filter(User.email == "test_teacher@edumentor.ai").first()
     if not user:
         user = User(
+            id="test-user-fixture-id",
             name="Test Teacher",
             email="test_teacher@edumentor.ai",
             password_hash=get_password_hash("password123"),
@@ -69,7 +69,11 @@ def auth_headers(client, db_session):
         db_session.add(user)
         db_session.commit()
         db_session.refresh(user)
+    return user
 
+
+@pytest.fixture(scope="function")
+def auth_headers(client, db_session, test_user):
     res = client.post("/api/auth/login", json={"email": "test_teacher@edumentor.ai", "password": "password123"})
     token = res.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}

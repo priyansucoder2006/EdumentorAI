@@ -1,5 +1,5 @@
 import React from 'react';
-import { GitCommit, ArrowRight, Layers } from 'lucide-react';
+import { GitCommit, ArrowRight, Layers, Sparkles } from 'lucide-react';
 
 interface DiagramRendererProps {
   title?: string;
@@ -9,20 +9,24 @@ interface DiagramRendererProps {
 }
 
 export const DiagramRenderer: React.FC<DiagramRendererProps> = ({
-  title = 'System Architecture & Flow',
+  title = 'System Architecture & Flow Diagram',
   data = {},
   caption,
 }) => {
-  const steps = data.steps || [
-    { title: 'Action Force', desc: 'Rocket expels high-speed gas downward (F_action)' },
-    { title: 'Interaction Boundary', desc: 'Newtonian Contact Interface' },
-    { title: 'Reaction Force', desc: 'Gas pushes rocket upward with equal force (F_reaction)' },
-  ];
+  // Extract steps dynamically or construct from analogy/concept
+  const rawSteps = data.steps || [];
+  const steps = rawSteps.length > 0
+    ? rawSteps
+    : [
+        { title: '1. Initial State / Input', desc: data.analogy ? `Intuition Context: ${data.analogy}` : 'Baseline conditions and input parameters' },
+        { title: '2. Core Interaction / Principle', desc: data.focus || data.concept || 'Governing physical, chemical, or logical rule transformation' },
+        { title: '3. Observable Output / Result', desc: data.example ? `Demonstrated Result: ${data.example}` : 'Final equilibrium state and systemic response' },
+      ];
 
   return (
     <div className="diagram-renderer-card">
       <div className="visual-header">
-        <span className="visual-badge diagram">Process Diagram</span>
+        <span className="visual-badge diagram">Process Flow</span>
         <h4>{title}</h4>
       </div>
 
@@ -50,6 +54,12 @@ export const DiagramRenderer: React.FC<DiagramRendererProps> = ({
       {data.key_rule && (
         <div className="diagram-callout">
           <Layers size={16} /> <strong>Rule:</strong> {data.key_rule}
+        </div>
+      )}
+
+      {data.analogy && !data.key_rule && (
+        <div className="diagram-callout">
+          <Sparkles size={16} /> <strong>Intuition:</strong> {data.analogy}
         </div>
       )}
 

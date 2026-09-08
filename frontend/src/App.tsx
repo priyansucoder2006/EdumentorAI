@@ -13,6 +13,7 @@ import { AnalyticsPage } from './pages/AnalyticsPage';
 import { LearningPathsPage } from './pages/LearningPathsPage';
 import { RevisionPage } from './pages/RevisionPage';
 import { DiagnosticsPage } from './pages/DiagnosticsPage';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import './App.css';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -125,11 +126,13 @@ export const AppContent: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </Router>
+    </ErrorBoundary>
   );
 };
 

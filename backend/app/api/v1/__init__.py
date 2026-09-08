@@ -9,6 +9,7 @@ from app.api.v1.progress import router as progress_router
 from app.api.v1.recommendations import router as recommendations_router
 from app.api.v1.videos import router as videos_router
 from app.api.v1.diagnostics import router as diagnostics_router
+from app.api.v1.voice import router as voice_router
 
 api_router = APIRouter()
 
@@ -22,3 +23,4 @@ api_router.include_router(progress_router, prefix="/progress", tags=["Progress &
 api_router.include_router(recommendations_router, prefix="/recommendations", tags=["Recommendations"])
 api_router.include_router(videos_router, prefix="/videos", tags=["Video Generation"])
 api_router.include_router(diagnostics_router, prefix="/diagnostics", tags=["Diagnostics & Traces"])
+api_router.include_router(voice_router, prefix="/voice", tags=["Voice TTS & STT"])

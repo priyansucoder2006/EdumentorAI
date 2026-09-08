@@ -8,6 +8,7 @@ import { VisualBoard } from '../components/classroom/VisualBoard';
 import { QuestionEngine } from '../components/classroom/QuestionEngine';
 import { MisconceptionModal } from '../components/classroom/MisconceptionModal';
 import { LessonSidebar } from '../components/classroom/LessonSidebar';
+import { VideoPlayerModal } from '../components/classroom/VideoPlayerModal';
 import {
   Volume2,
   VolumeX,
@@ -18,6 +19,10 @@ import {
   BookOpen,
   HelpCircle,
   Lightbulb,
+  Video,
+  Clock,
+  Target,
+  Award,
 } from 'lucide-react';
 
 export const ClassroomPage: React.FC = () => {
@@ -32,7 +37,9 @@ export const ClassroomPage: React.FC = () => {
   const [activeMisconception, setActiveMisconception] = useState<any>(null);
   const [adaptiveDecision, setAdaptiveDecision] = useState<any>(null);
   const [currentMastery, setCurrentMastery] = useState<number>(65);
+  const [pedagogicalState, setPedagogicalState] = useState<string>('EXPLAINING');
   const [teacherMood, setTeacherMood] = useState<'explaining' | 'questioning' | 'praising' | 'remedial'>('explaining');
+  const [showVideoModal, setShowVideoModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Load lesson
@@ -65,9 +72,11 @@ export const ClassroomPage: React.FC = () => {
   useEffect(() => {
     if (currentStep && isVoiceEnabled) {
       setTeacherMood('explaining');
+      setPedagogicalState('EXPLAINING');
       const speechText = `${currentStep.concept}. ${currentStep.explanation} ${currentStep.analogy ? `Think of it like this: ${currentStep.analogy}` : ''}`;
       voiceManager.speak(speechText, lesson?.language || 'en', () => {
         setTeacherMood('questioning');
+        setPedagogicalState('CHECKING_UNDERSTANDING');
       });
     }
   }, [currentStepIndex, lesson?.language]);
@@ -87,6 +96,7 @@ export const ClassroomPage: React.FC = () => {
   const handleAnswerSubmit = async (answerText: string, mode: string) => {
     if (!currentStep || !lesson) return;
     setIsSubmittingAnswer(true);
+    setPedagogicalState('EVALUATING');
 
     try {
       const interaction: Interaction = await lessonService.submitAnswer({
@@ -98,15 +108,26 @@ export const ClassroomPage: React.FC = () => {
       setCurrentMastery(interaction.current_mastery);
 
       if (interaction.evaluation.is_correct) {
-        // Praise student
-        setTeacherMood('praising');
+        // Praise student & check for higher difficulty
+        if (interaction.evaluation.score >= 0.85) {
+          setPedagogicalState('MASTERY_ACHIEVED');
+          setTeacherMood('praising');
+        } else {
+          setPedagogicalState('CONTINUE');
+          setTeacherMood('praising');
+        }
         setActiveMisconception(null);
         setAdaptiveDecision(interaction.adaptive_decision);
         if (isVoiceEnabled) {
-          voiceManager.speak('Shabash! Excellent explanation. You captured the core physical principle perfectly.', lesson.language);
+          voiceManager.speak(
+            interaction.adaptive_decision?.remedial_explanation || 'Excellent explanation! You captured the core foundational principle.',
+            lesson.language
+          );
         }
       } else {
-        // Misconception Detected!
+        // Misconception Diagnosed & Adaptive Reteach
+        setPedagogicalState('DIAGNOSING');
+        setTimeout(() => setPedagogicalState('RE_TEACHING'), 800);
         setTeacherMood('remedial');
         setActiveMisconception(interaction.misconception);
         setAdaptiveDecision(interaction.adaptive_decision);
@@ -148,7 +169,7 @@ export const ClassroomPage: React.FC = () => {
       const updated = await lessonService.switchLanguage(lesson.id, targetLang);
       setLesson(updated);
       if (isVoiceEnabled && currentStep) {
-        voiceManager.speak(`Language switched to ${targetLang}. Continuing our lesson seamlessly!`, targetLang);
+        voiceManager.speak(`Language updated to ${targetLang}. Continuing our adaptive lesson!`, targetLang);
       }
     } catch (err) {
       console.warn('Language switch error:', err);
@@ -165,6 +186,8 @@ export const ClassroomPage: React.FC = () => {
   }
 
   const isLastStep = currentStepIndex === (lesson.steps?.length || 1) - 1;
+  const currentObjective = lesson.objectives?.[currentStepIndex] || lesson.objectives?.[0] || 'Understand foundational principles';
+  const minutesRemaining = Math.max(1, Math.round(((lesson.steps.length - currentStepIndex) / lesson.steps.length) * (lesson.duration_minutes || 20)));
 
   return (
     <div className="classroom-layout-container">
@@ -187,17 +210,45 @@ export const ClassroomPage: React.FC = () => {
             <span className="step-pill-indicator">
               Step {currentStepIndex + 1} of {lesson.steps.length}
             </span>
+            <div className="flex items-center gap-2">
+              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
+                pedagogicalState === 'RE_TEACHING' || pedagogicalState === 'DIAGNOSING'
+                  ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                  : pedagogicalState === 'MASTERY_ACHIEVED'
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+              }`}>
+                State: {pedagogicalState.replace('_', ' ')}
+              </span>
+            </div>
             <h2 className="current-concept-headline">{currentStep.concept}</h2>
           </div>
 
-          <div className="classroom-top-actions">
+          <div className="classroom-top-actions flex items-center gap-3">
+            {/* Generate Video Lesson Button */}
+            <button
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-lg text-xs font-medium shadow-md transition-all"
+              onClick={() => setShowVideoModal(true)}
+              title="Generate MP4 Teaching Video"
+            >
+              <Video size={14} />
+              <span>Generate Video</span>
+            </button>
+
+            {/* Time remaining badge */}
+            <div className="flex items-center gap-1 text-xs text-slate-400 bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-slate-700">
+              <Clock size={13} className="text-cyan-400" />
+              <span>~{minutesRemaining} min remaining</span>
+            </div>
+
+            {/* Voice toggle */}
             <button
               className={`btn-voice-toggle ${isSpeaking ? 'active' : ''}`}
               onClick={handleToggleVoice}
               title={isVoiceEnabled ? 'Mute AI Teacher Voice' : 'Enable AI Teacher Voice'}
             >
               {isVoiceEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-              <span>{isSpeaking ? 'Teacher Speaking' : isVoiceEnabled ? 'Voice On' : 'Voice Muted'}</span>
+              <span>{isSpeaking ? 'Speaking...' : isVoiceEnabled ? 'Voice On' : 'Muted'}</span>
             </button>
           </div>
         </div>
@@ -218,7 +269,7 @@ export const ClassroomPage: React.FC = () => {
             <div className="teacher-speech-bubble">
               <div className="bubble-header">
                 <Sparkles size={14} className="text-blue-400" />
-                <span>Teacher Explanation</span>
+                <span>AI Teacher Explanation</span>
               </div>
               <p className="bubble-text">{currentStep.explanation}</p>
               {currentStep.analogy && (
@@ -276,6 +327,15 @@ export const ClassroomPage: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Video Generation & Playback Modal */}
+      {showVideoModal && (
+        <VideoPlayerModal
+          lessonId={lesson.id}
+          lessonTopic={lesson.topic}
+          onClose={() => setShowVideoModal(false)}
+        />
+      )}
     </div>
   );
 };

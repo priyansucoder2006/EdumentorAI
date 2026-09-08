@@ -19,8 +19,9 @@ def generate_video(
     db: Session = Depends(get_db)
 ):
     video_service = VideoGenerationService(db)
-    job = video_service.queue_video_generation(user_id=current_user.id, lesson_id=req.lesson_id)
-    background_tasks.add_task(video_service.process_job_async, job.id)
+    job, is_new = video_service.queue_video_generation(user_id=current_user.id, lesson_id=req.lesson_id)
+    if is_new:
+        background_tasks.add_task(video_service.process_job_async, job.id)
     return job
 
 

@@ -8,6 +8,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, pass: string) => Promise<void>;
+  demoLogin: () => Promise<void>;
   register: (data: any) => Promise<void>;
   logout: () => void;
   refreshProfile: () => Promise<void>;
@@ -86,6 +87,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const demoLogin = async () => {
+    return login('student@edumentor.ai', 'password123');
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -94,6 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: !!user,
         isLoading,
         login,
+        demoLogin,
         register,
         logout,
         refreshProfile,

@@ -15,13 +15,23 @@ import {
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, demoLogin, isAuthenticated } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleDemoLogin = async () => {
+    try {
+      await demoLogin();
+      navigate('/dashboard');
+    } catch (e) {
+      console.warn('Demo login failed:', e);
+      navigate('/login');
+    }
   };
 
   const navLinks = [
@@ -85,9 +95,12 @@ export const Navbar: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              <button onClick={handleDemoLogin} className="btn-primary btn-sm flex items-center gap-1">
+                <span>⚡ Demo Mode</span>
+              </button>
               <Link to="/login" className="btn-secondary btn-sm">Log In</Link>
-              <Link to="/register" className="btn-primary btn-sm">Register</Link>
+              <Link to="/register" className="btn-secondary btn-sm">Register</Link>
             </div>
           )}
         </div>

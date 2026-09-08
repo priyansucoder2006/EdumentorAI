@@ -35,6 +35,14 @@ class Settings(BaseSettings):
     AVATAR_PROVIDER: str = "canvas"
     AVATAR_API_KEY: str = ""
 
+    # Video & Speech Generation Providers
+    VIDEO_ENGINE: str = "fast_local"  # "fast_local", "d_id", "heygen"
+    D_ID_API_KEY: str = ""
+    HEYGEN_API_KEY: str = ""
+    ELEVENLABS_API_KEY: str = ""
+    VIDEO_FPS: int = 12
+    VIDEO_MAX_SCENES: int = 5
+
     # Document Storage
     UPLOAD_DIR: str = "./storage/uploads"
     MAX_UPLOAD_SIZE_MB: int = 25

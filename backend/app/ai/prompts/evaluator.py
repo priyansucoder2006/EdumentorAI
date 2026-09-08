@@ -19,3 +19,26 @@ Student Level: {difficulty}
 
 Return structured JSON conforming to AnswerEvaluationResult schema.
 """
+
+REMEDIATION_SYSTEM_PROMPT = """You are a master adaptive tutor specializing in dynamic remedial pedagogy.
+When a student struggles or demonstrates a misconception in ANY topic (physics, math, biology, computer science, history, etc.), your job is to craft a targeted remedial explanation, an intuitive real-world analogy, and a simpler diagnostic follow-up question.
+Never use canned or hardcoded responses. Tailor your explanation specifically to the diagnosed misconception and topic.
+"""
+
+REMEDIATION_PROMPT_TEMPLATE = """Generate an adaptive remedial intervention for this student:
+Topic/Concept: {concept}
+Original Question: {question_prompt}
+Student's Incorrect/Partial Answer: {student_answer}
+Diagnosed Misconception: {misconception_title} ({root_cause})
+Pedagogical Analogy Suggested: {pedagogical_analogy}
+Action Required: {action} (e.g. simplify, give_analogy, give_example, reteach)
+Language: {language}
+
+Return structured JSON with:
+- remedial_explanation: Clear, encouraging re-explanation addressing the misconception with the analogy.
+- follow_up_prompt: A simplified, intuitive multiple-choice question testing the core intuition.
+- options: 4 distinct multiple-choice options.
+- correct_option: The exact correct option string.
+- visual_title: Title for a visual diagram/card.
+- visual_takeaway: Key 1-line takeaway.
+"""

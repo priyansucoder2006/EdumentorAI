@@ -8,9 +8,9 @@ interface PhysicsSimProps {
 }
 
 export const PhysicsSim: React.FC<PhysicsSimProps> = ({
-  title = "Newton's First & Second Law Simulation",
+  title = 'Interactive Physics & Dynamic Simulation',
   data = {},
-  caption = "Observe that when Net Force = 0 N, the glider glides at constant speed indefinitely.",
+  caption = 'Observe the continuous physical response under the given system variables.',
 }) => {
   const [mass, setMass] = useState<number>(data.mass_kg || 2.0);
   const [force, setForce] = useState<number>(data.net_force_N !== undefined ? data.net_force_N : 0.0);
@@ -18,6 +18,7 @@ export const PhysicsSim: React.FC<PhysicsSimProps> = ({
   const [position, setPosition] = useState<number>(50);
   const [velocity, setVelocity] = useState<number>(data.velocity_mps || 3.0);
 
+  const objectName = data.object_name || 'System Object';
   const acceleration = mass > 0 ? force / mass : 0;
   const animFrameRef = useRef<number | null>(null);
 
@@ -51,16 +52,16 @@ export const PhysicsSim: React.FC<PhysicsSimProps> = ({
 
   const handleReset = () => {
     setPosition(50);
-    setVelocity(3.0);
-    setForce(0.0);
-    setMass(2.0);
+    setVelocity(data.velocity_mps || 3.0);
+    setForce(data.net_force_N || 0.0);
+    setMass(data.mass_kg || 2.0);
   };
 
   return (
     <div className="physics-sim-card">
       <div className="visual-header">
         <div className="flex items-center gap-2">
-          <span className="visual-badge physics">Physics Simulation</span>
+          <span className="visual-badge physics">Simulation</span>
           <h4>{title}</h4>
         </div>
         <div className="sim-controls">
@@ -89,7 +90,7 @@ export const PhysicsSim: React.FC<PhysicsSimProps> = ({
             <line key={x} x1={x} y1="110" x2={x} y2="118" stroke="#64748b" strokeWidth="2" />
           ))}
 
-          {/* Glider Object */}
+          {/* Glider / Physical Object */}
           <g transform={`translate(${position}, 70)`}>
             <rect x="0" y="0" width="60" height="38" rx="6" fill="#3b82f6" stroke="#60a5fa" strokeWidth="2" />
             <text x="30" y="24" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">
@@ -106,7 +107,6 @@ export const PhysicsSim: React.FC<PhysicsSimProps> = ({
                   y2="0"
                   stroke="#10b981"
                   strokeWidth="3"
-                  markerEnd="url(#arrow-vel)"
                 />
                 <text x={Math.min(60, velocity * 10) + 6} y="4" fill="#10b981" fontSize="10" fontWeight="bold">
                   v={velocity.toFixed(1)} m/s
@@ -138,7 +138,7 @@ export const PhysicsSim: React.FC<PhysicsSimProps> = ({
       <div className="sim-sliders-grid">
         <div className="slider-control">
           <label>
-            Net Applied Force (F): <strong>{force} N</strong>
+            Applied System Driver (F): <strong>{force} N</strong>
           </label>
           <input
             type="range"
@@ -152,7 +152,7 @@ export const PhysicsSim: React.FC<PhysicsSimProps> = ({
 
         <div className="slider-control">
           <label>
-            Glider Mass (m): <strong>{mass} kg</strong>
+            System Inertia/Mass (m): <strong>{mass} kg</strong>
           </label>
           <input
             type="range"
@@ -176,9 +176,9 @@ export const PhysicsSim: React.FC<PhysicsSimProps> = ({
           <span className="telemetry-val text-emerald">{velocity.toFixed(2)} m/s</span>
         </div>
         <div className="telemetry-item">
-          <span className="telemetry-label">Inertial State:</span>
+          <span className="telemetry-label">System State:</span>
           <span className="telemetry-val text-cyan">
-            {force === 0 ? 'Uniform Motion (1st Law)' : 'Accelerated Motion (2nd Law)'}
+            {force === 0 ? 'Equilibrium Motion' : 'Dynamic Accelerated State'}
           </span>
         </div>
       </div>

@@ -1,33 +1,36 @@
 from typing import Dict, Any, Optional
-from app.core.config import settings
+from app.services.voice.stt_provider import get_stt_provider
+from app.services.voice.tts_provider import get_tts_provider
 from app.core.logging import logger
 
 
 class VoiceService:
     def __init__(self):
-        self.stt_provider = settings.STT_PROVIDER
-        self.tts_provider = settings.TTS_PROVIDER
+        self.stt_provider = get_stt_provider()
+        self.tts_provider = get_tts_provider()
 
     async def transcribe_audio_blob(self, audio_bytes: bytes, language: str = "en") -> str:
         """
-        Transcribes student voice recording. Supports Whisper API / WebSpeech fallback.
+        Transcribes student voice recording using configured STT provider.
         """
         try:
-            # When in mock / webspeech mode, audio transcription is handled via frontend WebSpeech API
-            # or returns pedagogical voice fallback.
-            return "Newton's First law means objects keep moving unless friction slows them down."
+            return await self.stt_provider.transcribe(audio_bytes, language)
         except Exception as e:
             logger.error(f"Voice transcription error: {e}")
             return ""
 
+    async def synthesize_speech(self, text: str, language: str = "en") -> bytes:
+        """
+        Synthesizes speech audio bytes from text narration.
+        """
+        try:
+            return await self.tts_provider.synthesize(text, language)
+        except Exception as e:
+            logger.error(f"Voice synthesis error: {e}")
+            return b""
+
     def get_speech_synthesis_config(self, language: str = "en") -> Dict[str, Any]:
         """
-        Returns TTS voice configuration parameters for the frontend / backend audio synthesizer.
+        Returns TTS voice configuration parameters for client-side playback.
         """
-        voice_map = {
-            "en": {"voice": "en-US-JennyNeural", "lang": "en-US", "pitch": 1.0, "rate": 1.0},
-            "hi": {"voice": "hi-IN-SwaraNeural", "lang": "hi-IN", "pitch": 1.0, "rate": 0.95},
-            "hinglish": {"voice": "hi-IN-MadhurNeural", "lang": "hi-IN", "pitch": 1.0, "rate": 1.0},
-            "bn": {"voice": "bn-IN-TanishaaNeural", "lang": "bn-IN", "pitch": 1.0, "rate": 0.95}
-        }
-        return voice_map.get(language.lower(), voice_map["en"])
+        return self.tts_provider.get_voice_config(language)

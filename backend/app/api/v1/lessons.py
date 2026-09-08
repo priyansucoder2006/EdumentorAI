@@ -52,7 +52,7 @@ def get_lesson(
 
 
 @router.post("/{lesson_id}/state", response_model=LessonResponse)
-def transition_lesson_state(
+async def transition_lesson_state(
     lesson_id: str,
     req: LessonStateTransitionRequest,
     current_user: User = Depends(get_current_user),
@@ -66,12 +66,12 @@ def transition_lesson_state(
     if req.action == "next_step":
         return state_machine.advance_to_next_step(lesson_id)
     elif req.action == "switch_language" and req.target_language:
-        return state_machine.switch_language_in_lesson(lesson_id, req.target_language)
+        return await state_machine.switch_language_in_lesson(lesson_id, req.target_language)
     return state_machine.transition_state(lesson_id, req.action.upper())
 
 
 @router.post("/{lesson_id}/language", response_model=LessonResponse)
-def switch_lesson_language(
+async def switch_lesson_language(
     lesson_id: str,
     req: LessonLanguageSwitch,
     current_user: User = Depends(get_current_user),
@@ -82,4 +82,4 @@ def switch_lesson_language(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found.")
 
     state_machine = TeachingStateMachine(db)
-    return state_machine.switch_language_in_lesson(lesson_id, req.target_language)
+    return await state_machine.switch_language_in_lesson(lesson_id, req.target_language)

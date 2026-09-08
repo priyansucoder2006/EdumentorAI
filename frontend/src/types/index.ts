@@ -199,9 +199,16 @@ export interface MasteryOverview {
 export interface LearningPathNode {
   id: string;
   title: string;
+  phase_name?: string;
+  time_commitment?: string;
+  description?: string;
   difficulty: string;
-  status: string;
+  status: string; // 'completed' | 'in_progress' | 'locked'
   progress: number;
+  concepts?: string[];
+  practical_project?: string;
+  tools_and_resources?: string[];
+  prerequisites?: string[];
 }
 
 export interface LearningPath {

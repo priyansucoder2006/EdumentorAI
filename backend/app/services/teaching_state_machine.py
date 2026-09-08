@@ -5,6 +5,7 @@ from app.models.interaction import Interaction
 from app.models.learner_profile import LearnerProfile
 from app.schemas.lesson import LessonCreate, LessonPlanLLMOutput
 from app.ai.agents.planner_agent import LessonPlannerAgent
+from app.services.language_adapter import LanguageAdapterService
 from app.core.logging import logger
 
 
@@ -17,6 +18,7 @@ class TeachingStateMachine:
     def __init__(self, db: Session):
         self.db = db
         self.planner_agent = LessonPlannerAgent(db)
+        self.language_adapter = LanguageAdapterService()
 
     async def create_and_initialize_lesson(
         self,
@@ -27,7 +29,11 @@ class TeachingStateMachine:
         profile = self.db.query(LearnerProfile).filter(LearnerProfile.user_id == user_id).first()
         profile_dict = {
             "knowledge_level": profile.knowledge_level if profile else "beginner",
-            "learning_style": profile.learning_style if profile else "visual"
+            "learning_style": profile.learning_style if profile else "visual",
+            "learning_goal": profile.learning_goal if profile else "mastery",
+            "preferred_depth": profile.preferred_depth if profile else "intuitive",
+            "strong_topics": profile.strong_topics if profile else [],
+            "weak_topics": profile.weak_topics if profile else []
         }
 
         # 2. Plan lesson via AI Planner Agent
@@ -110,26 +116,17 @@ class TeachingStateMachine:
         self.db.refresh(lesson)
         return lesson
 
-    def switch_language_in_lesson(self, lesson_id: str, target_language: str) -> Lesson:
+    async def switch_language_in_lesson(self, lesson_id: str, target_language: str) -> Lesson:
         """
         Updates the lesson teaching language while preserving current step index,
-        mastery progress, and canonical formula structures.
+        mastery progress, and canonical formula structures using LanguageAdapterService.
         """
         lesson = self.db.query(Lesson).filter(Lesson.id == lesson_id).first()
         if not lesson:
             raise ValueError(f"Lesson {lesson_id} not found.")
 
-        lesson.language = target_language
-
-        # Hinglish translations for standard concepts
-        if target_language.lower() in ["hinglish", "hi"]:
-            for step in lesson.steps:
-                if "Inertia" in step.concept:
-                    step.explanation = "Newton ka First Law (Law of Inertia) kehta hai ki koi object tab tak apni state change nahi karega jab tak uspar koi bahari force na lage."
-                    step.analogy = "Socho ek frictionless ice surface par hockey puck ko slide kiya—wo bina ruke chalti rahegi!"
-                elif "Second Law" in step.concept:
-                    step.explanation = "Newton ka Second Law ($F = ma$) batata hai ki Force aur Acceleration directly proportional hote hain."
-                    step.analogy = "Bicycle ko push karna easy hai, lekin heavy truck ko push karne ke liye bohot zyada force chahiye."
+        # Adapt lesson steps and narration dynamically
+        await self.language_adapter.adapt_lesson_language(lesson, target_language)
 
         self.db.commit()
         self.db.refresh(lesson)

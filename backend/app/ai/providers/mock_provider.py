@@ -19,7 +19,10 @@ class MockPedagogicalProvider(BaseLLMProvider):
 
     async def generate_text(self, prompt: str, system_prompt: Optional[str] = None, **kwargs) -> str:
         prompt_lower = prompt.lower()
-        if "translate" in prompt_lower or "hinglish" in prompt_lower:
+        if "translate" in prompt_lower or "hinglish" in prompt_lower or "hindi" in prompt_lower or "bengali" in prompt_lower:
+            if "Input Text:" in prompt:
+                input_body = prompt.split("Input Text:", 1)[1].split("Output ONLY", 1)[0].strip()
+                return f"Chaliye is concept ko samajhte hain: {input_body}"
             return "Chaliye ab hum agla concept detail mein samajhte hain!"
         return "Let's explore this concept step by step."
 
@@ -481,13 +484,25 @@ class MockPedagogicalProvider(BaseLLMProvider):
         }
 
     def _diagnose_mock_misconception(self, prompt: str, prompt_lower: str) -> Dict[str, Any]:
-        root_cause = "Student believes force is necessary to maintain velocity, confusing friction with the intrinsic nature of motion."
-        title = "Aristotelian Motion Fallacy vs. Newtonian Inertia"
-        analogy = "Imagine sliding a hockey puck on frictionless ice in deep space. Once you give it a push, it glides forever without needing any continuous push!"
-        strategy = "Use frictionless thought experiments and contrast with friction-dominated everyday environments."
+        # Extract concept if present
+        concept_name = "the core principle"
+        for line in prompt.split("\n"):
+            if line.lower().startswith("concept:"):
+                concept_name = line.split(":", 1)[1].strip()
+                break
+
+        root_cause = f"Student held an intuitive misconception regarding {concept_name}, confusing intermediate effects with fundamental causes."
+        title = f"Intuition Gap in {concept_name}"
+        analogy = f"Think of {concept_name} like a balance scale where each factor must remain in equilibrium."
+        strategy = "Use step-by-step contrast between everyday assumptions and formal principles."
         severity = "medium"
 
-        if "current" in prompt_lower or "resistance" in prompt_lower:
+        if "photosynthesis" in prompt_lower or "chloroplast" in prompt_lower or "light" in prompt_lower:
+            root_cause = "Student confused the source of oxygen release in photosynthesis, assuming it comes from CO2 rather than the photolysis of H2O."
+            title = "Photolysis of Water vs. Carbon Fixation"
+            analogy = "Solar panels splitting water molecules to release oxygen gas as a byproduct while storing chemical energy in ATP."
+            strategy = "Light-dependent vs Calvin cycle visual diagram."
+        elif "current" in prompt_lower or "resistance" in prompt_lower:
             root_cause = "Student believes electric current gets used up or increases when opposition increases."
             title = "Current Flow vs. Resistance Inversion"
             analogy = "Think of a water pipe: making the pipe narrower (higher resistance) restricts the water flow, so LESS water comes out per second."
@@ -497,6 +512,11 @@ class MockPedagogicalProvider(BaseLLMProvider):
             title = "Mass-Independence of Gravitational Acceleration"
             analogy = "In Apollo 15's famous Moon experiment, astronaut David Scott dropped a heavy hammer and a light falcon feather simultaneously in the lunar vacuum; both hit the ground at the exact same instant!"
             strategy = "Vacuum drop thought experiment."
+        elif "newton" in prompt_lower or "inertia" in prompt_lower or "motion" in prompt_lower:
+            root_cause = "Student believes continuous force is necessary to maintain velocity, confusing friction with the intrinsic nature of motion."
+            title = "Aristotelian Motion Fallacy vs. Newtonian Inertia"
+            analogy = "Imagine sliding a hockey puck on frictionless ice in deep space. Once you give it a push, it glides forever without needing any continuous push!"
+            strategy = "Use frictionless thought experiments."
 
         return {
             "detected": True,
@@ -508,53 +528,136 @@ class MockPedagogicalProvider(BaseLLMProvider):
         }
 
     def _generate_mock_assessment(self, prompt: str, prompt_lower: str) -> Dict[str, Any]:
+        # Topic: Photosynthesis
+        if "photosynthesis" in prompt_lower or "chloroplast" in prompt_lower or "plant" in prompt_lower:
+            return {
+                "title": "Photosynthesis Comprehensive Assessment",
+                "questions": [
+                    {
+                        "id": "aq_photo_1",
+                        "concept": "Light-Dependent Reactions",
+                        "difficulty": "beginner",
+                        "type": "mcq",
+                        "prompt": "During the light-dependent reactions of photosynthesis, what is the primary role of water molecules?",
+                        "options": [
+                            "Water is split by photolysis to provide electrons and release oxygen gas.",
+                            "Water directly absorbs sunlight without chlorophyll.",
+                            "Water converts glucose into carbon dioxide.",
+                            "Water acts as a catalyst for ATP breakdown."
+                        ],
+                        "correct_answer": "Water is split by photolysis to provide electrons and release oxygen gas.",
+                        "explanation": "Photolysis of water inside the thylakoid membrane supplies replacement electrons to photosystem II and releases O2."
+                    },
+                    {
+                        "id": "aq_photo_2",
+                        "concept": "Calvin Cycle / Dark Reactions",
+                        "difficulty": "intermediate",
+                        "type": "mcq",
+                        "prompt": "Where does the Calvin cycle take place within the chloroplast?",
+                        "options": [
+                            "In the stroma of the chloroplast.",
+                            "Inside the thylakoid lumen.",
+                            "In the outer mitochondrial matrix.",
+                            "Along the cellular plasma membrane."
+                        ],
+                        "correct_answer": "In the stroma of the chloroplast.",
+                        "explanation": "The light-independent reactions (Calvin cycle) occur in the stroma, using ATP and NADPH to fix carbon into glucose."
+                    }
+                ]
+            }
+
+        # Topic: Newton's Laws
+        if "newton" in prompt_lower or "inertia" in prompt_lower or "motion" in prompt_lower:
+            return {
+                "title": "Newtonian Mechanics Comprehensive Assessment",
+                "questions": [
+                    {
+                        "id": "aq1",
+                        "concept": "Inertia and First Law",
+                        "difficulty": "beginner",
+                        "type": "mcq",
+                        "prompt": "If a space probe is traveling at 10,000 km/h in deep interstellar space far from any star or planet, how much rocket thrust is needed to keep it traveling at this speed?",
+                        "options": [
+                            "Zero thrust (0 N), because no external force is acting to slow it down.",
+                            "Continuous 10,000 N thrust.",
+                            "Thrust proportional to the mass of the probe.",
+                            "Constant thrust to overcome cosmic inertia."
+                        ],
+                        "correct_answer": "Zero thrust (0 N), because no external force is acting to slow it down.",
+                        "explanation": "According to Newton's First Law, an object in motion stays in motion at constant velocity when net external force is zero."
+                    },
+                    {
+                        "id": "aq2",
+                        "concept": "Second Law F = ma",
+                        "difficulty": "intermediate",
+                        "type": "mcq",
+                        "prompt": "A 5 kg mass is accelerated at 4 m/s². What net force was applied to the mass?",
+                        "options": [
+                            "20 N",
+                            "1.25 N",
+                            "0.8 N",
+                            "9 N"
+                        ],
+                        "correct_answer": "20 N",
+                        "explanation": "Using F = ma: F = 5 kg × 4 m/s² = 20 N."
+                    },
+                    {
+                        "id": "aq3",
+                        "concept": "Third Law Action-Reaction",
+                        "difficulty": "intermediate",
+                        "type": "mcq",
+                        "prompt": "Why don't action and reaction force pairs cancel each other out?",
+                        "options": [
+                            "Because they act on two different interacting objects, not the same object.",
+                            "Because action force is always slightly larger than reaction force.",
+                            "Because they occur at different times.",
+                            "Because reaction force exists only in fluids."
+                        ],
+                        "correct_answer": "Because they act on two different interacting objects, not the same object.",
+                        "explanation": "Newton's Third Law force pairs act on separate objects, so they do not cancel in a single object's free-body diagram."
+                    }
+                ]
+            }
+
+        # Generic Subject Assessment
+        topic_title = "Core Principles"
+        for line in prompt.split("\n"):
+            if "lesson on" in line.lower():
+                topic_title = line.split("lesson on", 1)[1].replace("'", "").strip(" :.")
+                break
+
         return {
-            "title": "Comprehensive Mastery Assessment",
+            "title": f"{topic_title} Mastery Assessment",
             "questions": [
                 {
-                    "id": "aq1",
-                    "concept": "Inertia and First Law",
+                    "id": "aq_gen_1",
+                    "concept": f"Foundations of {topic_title}",
                     "difficulty": "beginner",
                     "type": "mcq",
-                    "prompt": "If a space probe is traveling at 10,000 km/h in deep interstellar space far from any star or planet, how much rocket thrust is needed to keep it traveling at this speed?",
+                    "prompt": f"Which principle best captures the fundamental nature of {topic_title}?",
                     "options": [
-                        "Zero thrust (0 N), because no external force is acting to slow it down.",
-                        "Continuous 10,000 N thrust.",
-                        "Thrust proportional to the mass of the probe.",
-                        "Constant thrust to overcome cosmic inertia."
+                        f"The core governing equations and empirical principles of {topic_title}.",
+                        "A completely arbitrary set of uncorrelated rules.",
+                        "A concept that only applies in isolated theoretical models.",
+                        "None of the standard scientific observations."
                     ],
-                    "correct_answer": "Zero thrust (0 N), because no external force is acting to slow it down.",
-                    "explanation": "According to Newton's First Law, an object in motion stays in motion at constant velocity when net external force is zero."
+                    "correct_answer": f"The core governing equations and empirical principles of {topic_title}.",
+                    "explanation": f"Understanding {topic_title} relies upon its primary defining foundations."
                 },
                 {
-                    "id": "aq2",
-                    "concept": "Second Law F = ma",
+                    "id": "aq_gen_2",
+                    "concept": f"Applied {topic_title}",
                     "difficulty": "intermediate",
                     "type": "mcq",
-                    "prompt": "A 5 kg mass is accelerated at 4 m/s². What net force was applied to the mass?",
+                    "prompt": f"How is {topic_title} typically verified or applied in practical scenarios?",
                     "options": [
-                        "20 N",
-                        "1.25 N",
-                        "0.8 N",
-                        "9 N"
+                        "Through systematic experimental measurement and consistent observation.",
+                        "By disregarding all quantitative measurements.",
+                        "By assuming outcomes change randomly without rules.",
+                        "By only testing under impossible physical conditions."
                     ],
-                    "correct_answer": "20 N",
-                    "explanation": "Using F = ma: F = 5 kg × 4 m/s² = 20 N."
-                },
-                {
-                    "id": "aq3",
-                    "concept": "Third Law Action-Reaction",
-                    "difficulty": "intermediate",
-                    "type": "mcq",
-                    "prompt": "Why don't action and reaction force pairs cancel each other out?",
-                    "options": [
-                        "Because they act on two different interacting objects, not the same object.",
-                        "Because action force is always slightly larger than reaction force.",
-                        "Because they occur at different times.",
-                        "Because reaction force exists only in fluids."
-                    ],
-                    "correct_answer": "Because they act on two different interacting objects, not the same object.",
-                    "explanation": "Newton's Third Law force pairs act on separate objects, so they do not cancel in a single object's free-body diagram."
+                    "correct_answer": "Through systematic experimental measurement and consistent observation.",
+                    "explanation": f"Practical application of {topic_title} requires structured empirical verification."
                 }
             ]
         }

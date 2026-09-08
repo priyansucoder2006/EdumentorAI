@@ -66,7 +66,7 @@ Language: {lesson.language}"""
 
 
 @router.post("/{assessment_id}/submit", response_model=AssessmentResponse)
-def submit_assessment(
+async def submit_assessment(
     assessment_id: str,
     req: AssessmentSubmitRequest,
     current_user: User = Depends(get_current_user),
@@ -116,9 +116,9 @@ def submit_assessment(
     total_q = len(questions) or 1
     final_score = round((correct_count / total_q) * 100.0, 1)
 
-    # Recommender Engine
+    # Dynamic Recommender Engine
     recommender = RecommenderAgent()
-    recs = recommender.generate_recommendations(
+    recs = await recommender.generate_recommendations(
         topic=lesson.topic if lesson else "General Subject",
         overall_mastery=final_score,
         weak_concepts=weak,

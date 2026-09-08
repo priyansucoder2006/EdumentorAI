@@ -11,6 +11,21 @@ interface QuestionEngineProps {
   language?: string;
 }
 
+const normalizeOptions = (opts: any): string[] => {
+  if (!opts) return [];
+  if (Array.isArray(opts)) return opts;
+  if (typeof opts === 'string') {
+    try {
+      const parsed = JSON.parse(opts);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+    if (opts.includes('\n')) return opts.split('\n').map((s: string) => s.trim()).filter(Boolean);
+    if (opts.includes('  ')) return opts.split(/\s{2,}/).map((s: string) => s.trim()).filter(Boolean);
+    return [opts];
+  }
+  return [];
+};
+
 export const QuestionEngine: React.FC<QuestionEngineProps> = ({
   question,
   isSubmitting,
@@ -22,7 +37,8 @@ export const QuestionEngine: React.FC<QuestionEngineProps> = ({
   const [textAnswer, setTextAnswer] = useState<string>('');
   const [isListening, setIsListening] = useState<boolean>(false);
 
-  const isMCQ = question?.options && question.options.length > 0;
+  const options = normalizeOptions(question?.options);
+  const isMCQ = options.length > 0;
 
   const handleOptionSelect = (opt: string) => {
     setSelectedOption(opt);
@@ -70,7 +86,7 @@ export const QuestionEngine: React.FC<QuestionEngineProps> = ({
       <form onSubmit={handleSubmit}>
         {isMCQ ? (
           <div className="mcq-options-grid">
-            {question.options!.map((opt, idx) => {
+            {options.map((opt, idx) => {
               const isSelected = selectedOption === opt;
               return (
                 <button

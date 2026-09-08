@@ -8,7 +8,7 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('password123');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, demoLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,6 +20,19 @@ export const LoginPage: React.FC = () => {
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Login failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDemoAccess = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      await demoLogin();
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Demo login failed.');
     } finally {
       setLoading(false);
     }
@@ -73,13 +86,20 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        <div className="demo-credentials-banner">
-          <div className="flex items-center gap-1.5 font-semibold text-blue-300 mb-1">
-            <Sparkles size={14} /> Quick Demo Account
+        <button
+          type="button"
+          onClick={handleDemoAccess}
+          disabled={loading}
+          className="demo-credentials-banner w-full text-left cursor-pointer hover:bg-blue-600/20 transition-all border border-blue-500/40"
+        >
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-1.5 font-semibold text-blue-300">
+              <Sparkles size={14} /> Quick Demo Account (Click for Instant Access)
+            </div>
+            <ArrowRight size={14} className="text-blue-400" />
           </div>
-          <div>Email: <code>student@edumentor.ai</code></div>
-          <div>Password: <code>password123</code></div>
-        </div>
+          <div className="text-xs text-slate-300">Student: <code>student@edumentor.ai</code> | Pass: <code>password123</code></div>
+        </button>
 
         <div className="auth-footer">
           Don't have an account? <Link to="/register">Create one now</Link>
