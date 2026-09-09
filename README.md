@@ -20,9 +20,6 @@ $$\text{UNDERSTAND} \rightarrow \text{PLAN} \rightarrow \text{EXPLAIN} \rightarr
 | :--- | :--- | :--- |
 | 🚀 **Frontend Web Application** | [https://edumentor-frontend-fzvv.onrender.com](https://edumentor-frontend-fzvv.onrender.com) | React 18 + Vite + Tailwind CSS interactive student classroom |
 | ⚡ **Backend REST API** | [https://edumentor-backend-ma4l.onrender.com](https://edumentor-backend-ma4l.onrender.com) | FastAPI backend service with AI agent orchestration |
-| 📖 **Interactive Swagger Docs** | [https://edumentor-backend-ma4l.onrender.com/api/docs](https://edumentor-backend-ma4l.onrender.com/api/docs) | Live interactive API playground & testing suite |
-| 🔍 **OpenAPI JSON Schema** | [https://edumentor-backend-ma4l.onrender.com/api/openapi.json](https://edumentor-backend-ma4l.onrender.com/api/openapi.json) | Complete API schema specification |
-| 🐙 **Source Code Repository** | [https://github.com/rohancoder19/EduMentorAI](https://github.com/rohancoder19/EduMentorAI) | GitHub Repository |
 
 ### 🔑 Instant Demo Account (For Evaluation)
 Judges and evaluators can log in immediately with the pre-seeded account or click the **"Quick Demo Account"** button on the login screen:
