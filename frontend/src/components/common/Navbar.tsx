@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { YouTubeRecommendationModal } from '../classroom/YouTubeRecommendationModal';
 import {
   GraduationCap,
   LayoutDashboard,
@@ -12,12 +13,14 @@ import {
   Activity,
   LogOut,
   User as UserIcon,
+  Youtube,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { user, logout, demoLogin, isAuthenticated } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [showYtModal, setShowYtModal] = useState<boolean>(false);
 
   const handleLogout = () => {
     logout();
@@ -45,66 +48,95 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <header className="app-navbar">
-      <div className="navbar-container">
-        {/* Brand Logo */}
-        <Link to="/dashboard" className="navbar-brand">
-          <div className="brand-icon-box">
-            <GraduationCap size={24} className="text-blue-400" />
-          </div>
-          <div className="brand-text-group">
-            <span className="brand-title">EduMentor AI</span>
-            <span className="brand-tagline">Adaptive AI Teacher</span>
-          </div>
-        </Link>
+    <>
+      <header className="app-navbar">
+        <div className="navbar-container">
+          {/* Brand Logo */}
+          <Link to="/dashboard" className="navbar-brand">
+            <div className="brand-icon-box">
+              <GraduationCap size={24} className="text-blue-400" />
+            </div>
+            <div className="brand-text-group">
+              <span className="brand-title">EduMentor AI</span>
+              <span className="brand-tagline">Adaptive AI Teacher</span>
+            </div>
+          </Link>
 
-        {/* Navigation Links */}
-        {isAuthenticated && (
-          <nav className="navbar-nav">
-            {navLinks.map((link) => {
-              const isActive = location.pathname === link.path;
-              return (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`nav-link-item ${isActive ? 'active' : ''}`}
-                >
-                  {link.icon}
-                  <span>{link.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        )}
+          {/* Navigation Links */}
+          {isAuthenticated && (
+            <nav className="navbar-nav">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`nav-link-item ${isActive ? 'active' : ''}`}
+                  >
+                    {link.icon}
+                    <span>{link.label}</span>
+                  </Link>
+                );
+              })}
 
-        {/* User Profile / Logout */}
-        <div className="navbar-user-actions">
-          {isAuthenticated ? (
-            <div className="user-profile-menu">
-              <div className="user-avatar-pill">
-                <UserIcon size={16} className="text-blue-400" />
-                <span className="user-name">{user?.name || 'Learner'}</span>
-                <span className="user-lang-badge">{user?.preferred_language || 'en'}</span>
-              </div>
+              {/* Quick YouTube Learning Button in Nav */}
               <button
-                className="btn-logout"
-                onClick={handleLogout}
-                title="Log Out"
+                onClick={() => setShowYtModal(true)}
+                className="nav-link-item text-red-400 hover:text-red-300 font-semibold flex items-center gap-1.5"
+                title="AI YouTube Learning Recommendation"
               >
-                <LogOut size={16} />
+                <Youtube size={18} />
+                <span>YouTube Hub</span>
               </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <button onClick={handleDemoLogin} className="btn-primary btn-sm flex items-center gap-1">
-                <span>⚡ Demo Mode</span>
-              </button>
-              <Link to="/login" className="btn-secondary btn-sm">Log In</Link>
-              <Link to="/register" className="btn-secondary btn-sm">Register</Link>
-            </div>
+            </nav>
           )}
+
+          {/* User Profile / Logout */}
+          <div className="navbar-user-actions">
+            {isAuthenticated ? (
+              <div className="user-profile-menu">
+                <div className="user-avatar-pill">
+                  <UserIcon size={16} className="text-blue-400" />
+                  <span className="user-name">{user?.name || 'Learner'}</span>
+                  <span className="user-lang-badge">{user?.preferred_language || 'en'}</span>
+                </div>
+                <button
+                  className="btn-logout"
+                  onClick={handleLogout}
+                  title="Log Out"
+                >
+                  <LogOut size={16} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowYtModal(true)}
+                  className="btn-secondary btn-sm flex items-center gap-1 text-red-400"
+                >
+                  <Youtube size={14} />
+                  <span>YouTube</span>
+                </button>
+                <button onClick={handleDemoLogin} className="btn-primary btn-sm flex items-center gap-1">
+                  <span>⚡ Demo Mode</span>
+                </button>
+                <Link to="/login" className="btn-secondary btn-sm">Log In</Link>
+                <Link to="/register" className="btn-secondary btn-sm">Register</Link>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* YouTube Recommendation Modal */}
+      {showYtModal && (
+        <YouTubeRecommendationModal
+          initialTopic="Recursion in Python"
+          initialDurationMinutes={20}
+          onClose={() => setShowYtModal(false)}
+        />
+      )}
+    </>
   );
 };
+

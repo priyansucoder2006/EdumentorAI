@@ -4,6 +4,7 @@ import { CodeRunner } from '../visual_renderers/CodeRunner';
 import { GraphRenderer } from '../visual_renderers/GraphRenderer';
 import { DiagramRenderer } from '../visual_renderers/DiagramRenderer';
 import { PhysicsSim } from '../visual_renderers/PhysicsSim';
+import { YouTubeVideoCard } from '../visual_renderers/YouTubeVideoCard';
 import { VisualData } from '../../types';
 import { BookOpen, Lightbulb } from 'lucide-react';
 
@@ -26,6 +27,21 @@ export const VisualBoard: React.FC<VisualBoardProps> = ({
   const caption = visualData?.caption;
 
   switch (vType) {
+    case 'youtube_video':
+    case 'video_recommendation':
+    case 'youtube':
+      return (
+        <YouTubeVideoCard
+          video={vData.video}
+          title={vData.title || title}
+          channel={vData.channel}
+          duration={vData.duration}
+          thumbnail={vData.thumbnail}
+          url={vData.url}
+          reason={vData.reason}
+        />
+      );
+
     case 'math':
       return (
         <MathRenderer
@@ -41,7 +57,7 @@ export const VisualBoard: React.FC<VisualBoardProps> = ({
         <CodeRunner
           title={title}
           initialCode={vData.code}
-          language={vData.language || 'typescript'}
+          language={vData.language || 'python'}
           expectedOutput={vData.output}
         />
       );

@@ -10,6 +10,8 @@ from app.api.v1.recommendations import router as recommendations_router
 from app.api.v1.videos import router as videos_router
 from app.api.v1.diagnostics import router as diagnostics_router
 from app.api.v1.voice import router as voice_router
+from app.api.v1.code import router as code_router
+from app.api.v1.learning_video import router as learning_video_router
 
 api_router = APIRouter()
 
@@ -24,3 +26,6 @@ api_router.include_router(recommendations_router, prefix="/recommendations", tag
 api_router.include_router(videos_router, prefix="/videos", tags=["Video Generation"])
 api_router.include_router(diagnostics_router, prefix="/diagnostics", tags=["Diagnostics & Traces"])
 api_router.include_router(voice_router, prefix="/voice", tags=["Voice TTS & STT"])
+api_router.include_router(code_router, prefix="/code", tags=["Code Execution (Judge0)"])
+api_router.include_router(learning_video_router, prefix="/learning", tags=["Learning Video Recommendation"])
+

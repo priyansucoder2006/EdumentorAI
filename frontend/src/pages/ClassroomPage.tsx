@@ -9,6 +9,7 @@ import { QuestionEngine } from '../components/classroom/QuestionEngine';
 import { MisconceptionModal } from '../components/classroom/MisconceptionModal';
 import { LessonSidebar } from '../components/classroom/LessonSidebar';
 import { VideoPlayerModal } from '../components/classroom/VideoPlayerModal';
+import { YouTubeRecommendationModal } from '../components/classroom/YouTubeRecommendationModal';
 import {
   Volume2,
   VolumeX,
@@ -23,6 +24,7 @@ import {
   Clock,
   Target,
   Award,
+  Youtube,
 } from 'lucide-react';
 
 export const ClassroomPage: React.FC = () => {
@@ -40,6 +42,7 @@ export const ClassroomPage: React.FC = () => {
   const [pedagogicalState, setPedagogicalState] = useState<string>('EXPLAINING');
   const [teacherMood, setTeacherMood] = useState<'explaining' | 'questioning' | 'praising' | 'remedial'>('explaining');
   const [showVideoModal, setShowVideoModal] = useState<boolean>(false);
+  const [showYtModal, setShowYtModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Load lesson
@@ -224,7 +227,17 @@ export const ClassroomPage: React.FC = () => {
             <h2 className="current-concept-headline">{currentStep.concept}</h2>
           </div>
 
-          <div className="classroom-top-actions flex items-center gap-3">
+          <div className="classroom-top-actions flex items-center gap-2 sm:gap-3">
+            {/* AI YouTube Learning Video Button */}
+            <button
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600/90 hover:bg-red-500 text-white rounded-lg text-xs font-semibold shadow-md transition-all border border-red-500/40"
+              onClick={() => setShowYtModal(true)}
+              title="Find Best YouTube Learning Video for this Concept"
+            >
+              <Youtube size={14} />
+              <span>YouTube Video</span>
+            </button>
+
             {/* Generate Video Lesson Button */}
             <button
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-lg text-xs font-medium shadow-md transition-all"
@@ -334,6 +347,15 @@ export const ClassroomPage: React.FC = () => {
           lessonId={lesson.id}
           lessonTopic={lesson.topic}
           onClose={() => setShowVideoModal(false)}
+        />
+      )}
+
+      {/* YouTube Recommendation Modal */}
+      {showYtModal && (
+        <YouTubeRecommendationModal
+          initialTopic={`${currentStep.concept} (${lesson.topic})`}
+          initialDurationMinutes={lesson.duration_minutes || 20}
+          onClose={() => setShowYtModal(false)}
         />
       )}
     </div>

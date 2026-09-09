@@ -221,3 +221,60 @@ export interface LearningPath {
   progress_percentage: number;
   created_at: string;
 }
+
+export interface CodeExecutionResult {
+  success: boolean;
+  language: string;
+  status: string;
+  stdout: string;
+  stderr: string;
+  compile_output: string;
+  execution_time?: string;
+  memory?: string;
+  error?: string;
+  status_id?: number;
+}
+
+export interface CodeExecutionResponse {
+  success: boolean;
+  result: CodeExecutionResult;
+  message?: string;
+}
+
+export interface LanguageItem {
+  id: number;
+  name: string;
+  is_archived?: boolean;
+}
+
+export interface YouTubeVideoMetadata {
+  video_id: string;
+  title: string;
+  channel: string;
+  description?: string;
+  thumbnail: string;
+  duration: string;
+  duration_minutes: number;
+  duration_seconds: number;
+  view_count?: number;
+  like_count?: number;
+  published_at?: string;
+  embeddable: boolean;
+  url: string;
+  reason?: string;
+  score?: number;
+}
+
+export interface LearningVideoResponse {
+  found: boolean;
+  title?: string;
+  channel?: string;
+  video_id?: string;
+  url?: string;
+  duration?: string;
+  duration_minutes?: number;
+  thumbnail?: string;
+  reason?: string;
+  video?: YouTubeVideoMetadata;
+}
+

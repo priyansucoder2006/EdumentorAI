@@ -3,7 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { progressService } from '../services/progressService';
 import { lessonService } from '../services/lessonService';
-import { MasteryOverview, Lesson, RecommendationItem } from '../types';
+import { learningVideoService } from '../services/learningVideoService';
+import { YouTubeVideoCard } from '../components/visual_renderers/YouTubeVideoCard';
+import { MasteryOverview, Lesson, RecommendationItem, YouTubeVideoMetadata } from '../types';
 import {
   Sparkles,
   BookOpen,
@@ -15,6 +17,8 @@ import {
   Play,
   CheckCircle2,
   FolderOpen,
+  Youtube,
+  Loader2,
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
@@ -27,6 +31,34 @@ export const DashboardPage: React.FC = () => {
   const [quickTopic, setQuickTopic] = useState('');
   const [quickTime, setQuickTime] = useState<number>(20);
   const [loading, setLoading] = useState(true);
+
+  // YouTube Video Recommendation State
+  const [ytTopic, setYtTopic] = useState<string>('Recursion in Python');
+  const [ytDuration, setYtDuration] = useState<number>(20);
+  const [ytPref, setYtPref] = useState<string>('around');
+  const [ytLoading, setYtLoading] = useState<boolean>(false);
+  const [ytResult, setYtResult] = useState<YouTubeVideoMetadata | null>(null);
+  const [ytError, setYtError] = useState<string | null>(null);
+
+  const handleVideoSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ytTopic.trim()) return;
+    setYtLoading(true);
+    setYtError(null);
+    try {
+      const resp = await learningVideoService.findLearningVideo(ytTopic, ytDuration, ytPref);
+      if (resp.found && resp.video) {
+        setYtResult(resp.video);
+      } else {
+        setYtError(resp.reason || 'No suitable video found.');
+      }
+    } catch (err: any) {
+      setYtError(err.message || 'Failed to fetch YouTube recommendation.');
+    } finally {
+      setYtLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -166,11 +198,79 @@ export const DashboardPage: React.FC = () => {
             </div>
           )}
 
+          {/* AI-Powered YouTube Video Recommendation Hub */}
+          <div className="dashboard-section-box bg-slate-900 border border-slate-700/80 rounded-xl p-5 mb-5 shadow-lg">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="section-title flex items-center gap-2 text-base font-bold text-white">
+                <span className="p-1 rounded-md bg-red-600/20 text-red-400 border border-red-500/30">
+                  <Youtube size={16} />
+                </span>
+                <span>AI YouTube Learning Recommendation</span>
+              </h3>
+              <span className="text-xs text-slate-400 font-medium">Duration-Aware • Exactly 1 Video</span>
+            </div>
+            <p className="text-xs text-slate-300 mb-4">
+              Need deeper understanding? Search the official YouTube Data API v3 for <strong>exactly ONE</strong> verified educational video matching your exact target time.
+            </p>
+
+            <form onSubmit={handleVideoSearch} className="flex flex-col sm:flex-row gap-2 mb-4">
+              <input
+                type="text"
+                placeholder="Topic (e.g. Recursion in Python, React Hooks, Docker)..."
+                value={ytTopic}
+                onChange={(e) => setYtTopic(e.target.value)}
+                className="flex-1 bg-slate-950 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:border-red-500"
+              />
+              <select
+                value={ytDuration}
+                onChange={(e) => setYtDuration(Number(e.target.value))}
+                className="bg-slate-950 text-slate-200 text-xs rounded-lg px-2.5 py-2 border border-slate-700 focus:outline-none focus:border-red-500"
+              >
+                <option value={10}>~10 mins</option>
+                <option value={20}>~20 mins</option>
+                <option value={30}>~30 mins</option>
+                <option value={60}>~60 mins</option>
+                <option value={90}>~90 mins</option>
+              </select>
+              <select
+                value={ytPref}
+                onChange={(e) => setYtPref(e.target.value)}
+                className="bg-slate-950 text-slate-200 text-xs rounded-lg px-2.5 py-2 border border-slate-700 focus:outline-none focus:border-red-500"
+              >
+                <option value="around">Around Time</option>
+                <option value="under">Under (Max)</option>
+                <option value="minimum">At least (60m+)</option>
+                <option value="short">Short</option>
+                <option value="detailed">Detailed</option>
+              </select>
+              <button
+                type="submit"
+                disabled={ytLoading || !ytTopic.trim()}
+                className="px-3.5 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 shadow transition-all disabled:opacity-50"
+              >
+                {ytLoading ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
+                <span>{ytLoading ? 'Finding...' : 'Recommend Video'}</span>
+              </button>
+            </form>
+
+            {/* Video Result display */}
+            {ytResult && (
+              <div className="mt-3">
+                <YouTubeVideoCard video={ytResult} />
+              </div>
+            )}
+            {ytError && (
+              <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs text-amber-400">
+                {ytError}
+              </div>
+            )}
+          </div>
+
           {/* Quick Recommended Topics */}
           <div className="dashboard-section-box">
             <div className="flex justify-between items-center mb-3">
               <h3 className="section-title flex items-center gap-2">
-                <Sparkles size={18} className="text-blue-400" /> Recommended for You
+                <Sparkles size={18} className="text-blue-400" /> Recommended Lessons for You
               </h3>
               <Link to="/create-lesson" className="text-xs text-blue-400 hover:underline">View All</Link>
             </div>

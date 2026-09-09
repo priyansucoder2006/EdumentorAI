@@ -47,6 +47,16 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "./storage/uploads"
     MAX_UPLOAD_SIZE_MB: int = 25
 
+    # Self-Hosted Judge0 Code Execution
+    JUDGE0_API_URL: str = "http://localhost:2358"
+    MAX_CODE_SIZE_BYTES: int = 65536  # 64 KB max source code
+    MAX_STDIN_SIZE_BYTES: int = 65536  # 64 KB max standard input
+    MAX_OUTPUT_SIZE_BYTES: int = 131072  # 128 KB max output truncate limit
+    CODE_EXECUTION_TIMEOUT_SECONDS: float = 15.0
+
+    # YouTube Learning Video Recommendation
+    YOUTUBE_API_KEY: str = ""
+
     # CORS
     CORS_ORIGINS: List[str] = [
         "http://localhost:5173",
