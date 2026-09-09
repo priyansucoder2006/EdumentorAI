@@ -13,6 +13,22 @@ $$\text{UNDERSTAND} \rightarrow \text{PLAN} \rightarrow \text{EXPLAIN} \rightarr
 
 ---
 
+## 🌐 Live Deployment & Demo Links (For Evaluation / Judgement)
+
+| Service | Live URL | Description |
+| :--- | :--- | :--- |
+| 🚀 **Frontend Web Application** | [https://edumentor-frontend-fzvv.onrender.com](https://edumentor-frontend-fzvv.onrender.com) | React 18 + Vite + Tailwind CSS interactive student classroom |
+| ⚡ **Backend REST API** | [https://edumentor-backend-ma4l.onrender.com](https://edumentor-backend-ma4l.onrender.com) | FastAPI backend service with AI agent orchestration |
+| 📖 **Interactive Swagger Docs** | [https://edumentor-backend-ma4l.onrender.com/api/docs](https://edumentor-backend-ma4l.onrender.com/api/docs) | Live interactive API playground & testing suite |
+| 🔍 **OpenAPI JSON Schema** | [https://edumentor-backend-ma4l.onrender.com/api/openapi.json](https://edumentor-backend-ma4l.onrender.com/api/openapi.json) | Complete API schema specification |
+
+### 🔑 Instant Demo Account (For Judgement)
+Judges can log in immediately with the pre-seeded account or click the **"Quick Demo Account"** button on the login screen:
+- **Email:** `student@edumentor.ai`
+- **Password:** `password123`
+
+---
+
 ## 🎯 Key Capabilities & Innovations
 
 ### 1. 💻 Multi-Language Sandboxed Code Execution (Self-Hosted Judge0)
