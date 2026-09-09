@@ -29,13 +29,16 @@ export const AnalyticsPage: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const conceptDetails: ConceptMastery[] = mastery?.concept_details || [
-    { topic: "Newton's Laws", concept: 'Inertia & First Law', mastery_score: 92, attempts: 3, correct_attempts: 3, difficulty_level: 'beginner', last_studied: new Date().toISOString() },
-    { topic: "Newton's Laws", concept: 'Second Law (F = ma)', mastery_score: 84, attempts: 2, correct_attempts: 2, difficulty_level: 'intermediate', last_studied: new Date().toISOString() },
-    { topic: "Newton's Laws", concept: 'Action-Reaction Pairs', mastery_score: 75, attempts: 2, correct_attempts: 1, difficulty_level: 'intermediate', last_studied: new Date().toISOString() },
-    { topic: "Ohm's Law", concept: 'V = IR Relationship', mastery_score: 88, attempts: 2, correct_attempts: 2, difficulty_level: 'beginner', last_studied: new Date().toISOString() },
-    { topic: 'React', concept: 'Components & Immutability', mastery_score: 90, attempts: 1, correct_attempts: 1, difficulty_level: 'beginner', last_studied: new Date().toISOString() },
-  ];
+  const hasRealDetails = Boolean(mastery?.concept_details && mastery.concept_details.length > 0);
+  const conceptDetails: ConceptMastery[] = hasRealDetails
+    ? mastery!.concept_details
+    : [
+        { topic: "Newton's Laws", concept: 'Inertia & First Law', mastery_score: 92, attempts: 3, correct_attempts: 3, difficulty_level: 'beginner', last_studied: new Date().toISOString() },
+        { topic: "Newton's Laws", concept: 'Second Law (F = ma)', mastery_score: 84, attempts: 2, correct_attempts: 2, difficulty_level: 'intermediate', last_studied: new Date().toISOString() },
+        { topic: "Newton's Laws", concept: 'Action-Reaction Pairs', mastery_score: 75, attempts: 2, correct_attempts: 1, difficulty_level: 'intermediate', last_studied: new Date().toISOString() },
+        { topic: "Ohm's Law", concept: 'V = IR Relationship', mastery_score: 88, attempts: 2, correct_attempts: 2, difficulty_level: 'beginner', last_studied: new Date().toISOString() },
+        { topic: 'React Programming', concept: 'Components & Immutability', mastery_score: 90, attempts: 1, correct_attempts: 1, difficulty_level: 'beginner', last_studied: new Date().toISOString() },
+      ];
 
   const chartData = conceptDetails.map((c) => ({
     name: c.concept.length > 18 ? c.concept.substring(0, 18) + '...' : c.concept,

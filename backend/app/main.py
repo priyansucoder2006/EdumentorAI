@@ -58,7 +58,23 @@ async def lifespan(app: FastAPI):
             )
             db.add(demo_profile)
             db.commit()
+            existing_user = demo_user
             logger.info("Created default demo user: student@edumentor.ai / password123")
+
+        # Ensure demo user has realistic cognitive mastery progress records
+        if existing_user:
+            prog_count = db.query(LearningProgress).filter(LearningProgress.user_id == existing_user.id).count()
+            if prog_count == 0:
+                demo_progress = [
+                    LearningProgress(user_id=existing_user.id, topic="Newton's Laws of Motion", concept="Inertia & First Law", mastery_score=92.0, attempts=3, correct_attempts=3, difficulty_level="beginner"),
+                    LearningProgress(user_id=existing_user.id, topic="Newton's Laws of Motion", concept="Second Law (F = ma)", mastery_score=84.0, attempts=2, correct_attempts=2, difficulty_level="intermediate"),
+                    LearningProgress(user_id=existing_user.id, topic="Newton's Laws of Motion", concept="Action-Reaction Pairs", mastery_score=75.0, attempts=2, correct_attempts=1, difficulty_level="intermediate"),
+                    LearningProgress(user_id=existing_user.id, topic="Electricity & Circuits", concept="Ohm's Law (V = IR)", mastery_score=88.0, attempts=2, correct_attempts=2, difficulty_level="beginner"),
+                    LearningProgress(user_id=existing_user.id, topic="Python Programming", concept="Control Flow & Functions", mastery_score=90.0, attempts=1, correct_attempts=1, difficulty_level="beginner"),
+                ]
+                db.add_all(demo_progress)
+                db.commit()
+                logger.info("Seeded initial cognitive mastery progress for student@edumentor.ai")
     except Exception as e:
         logger.error(f"Error during startup initialization: {e}")
     finally:

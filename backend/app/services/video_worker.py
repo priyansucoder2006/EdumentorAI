@@ -108,6 +108,12 @@ class VideoGenerationService:
 
             def progress_callback(pct: int, message: str):
                 # Thread-safe database progress commit inside callback worker thread
+                if db is not None:
+                    job.progress = min(99, max(job.progress, pct))
+                    if pct >= 20 and job.status != "rendering":
+                        job.status = "rendering"
+                    worker_db.commit()
+                    return
                 p_db = SessionLocal()
                 try:
                     p_job = p_db.query(VideoJob).filter(VideoJob.id == job_id).first()
@@ -129,34 +135,48 @@ class VideoGenerationService:
                 progress_callback=progress_callback
             )
 
-            # Final completion commit in dedicated session
-            final_db = SessionLocal()
-            try:
-                final_job = final_db.query(VideoJob).filter(VideoJob.id == job_id).first()
-                if final_job:
-                    final_job.status = "completed"
-                    final_job.progress = 100
-                    final_job.video_url = result["video_url"]
-                    final_job.scenes_data = result["scenes_data"]
-                    final_job.updated_at = datetime.now(timezone.utc)
-                    final_db.commit()
-                    logger.info(f"Video job {job_id} successfully finished! Playable MP4: {output_mp4_path} ({result['file_size']} bytes)")
-            finally:
-                final_db.close()
+            # Final completion commit
+            if db is not None:
+                job.status = "completed"
+                job.progress = 100
+                job.video_url = result["video_url"]
+                job.scenes_data = result["scenes_data"]
+                job.updated_at = datetime.now(timezone.utc)
+                worker_db.commit()
+                logger.info(f"Video job {job_id} successfully finished! Playable MP4: {output_mp4_path} ({result['file_size']} bytes)")
+            else:
+                final_db = SessionLocal()
+                try:
+                    final_job = final_db.query(VideoJob).filter(VideoJob.id == job_id).first()
+                    if final_job:
+                        final_job.status = "completed"
+                        final_job.progress = 100
+                        final_job.video_url = result["video_url"]
+                        final_job.scenes_data = result["scenes_data"]
+                        final_job.updated_at = datetime.now(timezone.utc)
+                        final_db.commit()
+                        logger.info(f"Video job {job_id} successfully finished! Playable MP4: {output_mp4_path} ({result['file_size']} bytes)")
+                finally:
+                    final_db.close()
 
         except Exception as e:
             logger.error(f"Error executing video job {job_id}: {e}", exc_info=True)
-            err_db = SessionLocal()
-            try:
-                err_job = err_db.query(VideoJob).filter(VideoJob.id == job_id).first()
-                if err_job:
-                    err_job.status = "failed"
-                    err_job.error_message = str(e)
-                    err_db.commit()
-            except Exception:
-                pass
-            finally:
-                err_db.close()
+            if db is not None:
+                job.status = "failed"
+                job.error_message = str(e)
+                worker_db.commit()
+            else:
+                err_db = SessionLocal()
+                try:
+                    err_job = err_db.query(VideoJob).filter(VideoJob.id == job_id).first()
+                    if err_job:
+                        err_job.status = "failed"
+                        err_job.error_message = str(e)
+                        err_db.commit()
+                except Exception:
+                    pass
+                finally:
+                    err_db.close()
         finally:
             if should_close_main:
                 worker_db.close()
