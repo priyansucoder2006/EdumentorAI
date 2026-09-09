@@ -10,7 +10,7 @@
 
 **EduMentor AI** is a production-grade, full-stack adaptive AI teaching system engineered to emulate a master human mentor. Rather than functioning as a standard question-and-answer chatbot, EduMentor AI executes continuous pedagogical feedback, sandboxed multi-language code compilation, AI video synthesis, and multi-modal learning loops:
 
-$$\text{UNDERSTAND} \rightarrow \text{PLAN} \rightarrow \text{EXPLAIN} \rightarrow \text{DEMONSTRATE} \rightarrow \text{QUESTION} \rightarrow \text{EVALUATE} \rightarrow \text{ADAPT} \rightarrow \text{CONTINUE} \rightarrow \text{ASSESS} \rightarrow \text{REMEMBER}$$
+> `UNDERSTAND` ➔ `PLAN` ➔ `EXPLAIN` ➔ `DEMONSTRATE` ➔ `QUESTION` ➔ `EVALUATE` ➔ `ADAPT` ➔ `CONTINUE` ➔ `ASSESS` ➔ `REMEMBER`
 
 ---
 
@@ -37,16 +37,16 @@ Judges and evaluators can log in immediately with the pre-seeded account or clic
 - **Multilingual Delivery**: Supports on-the-fly language switching (English, Hinglish, Hindi, Bengali, Spanish, etc.) across the full curriculum.
 
 ### 2. 💻 Multi-Language Sandboxed Code Execution (Self-Hosted Judge0)
-- **Architecture**:
-  $$\text{AI Agent} \rightarrow \text{execute\_code Tool} \rightarrow \text{CodeExecutionService} \rightarrow \text{Judge0Provider} \rightarrow \text{Self-Hosted Judge0}$$
+- **Architecture Flow**:
+  > `AI Agent` ➔ `execute_code Tool` ➔ `CodeExecutionService` ➔ `Judge0Provider` ➔ `Self-Hosted Judge0`
 - **Zero Paid Dependencies**: EduMentor AI uses a self-hosted Judge0 instance for code execution. **No Judge0 API key or paid Judge0 cloud account is required.**
 - **Supported Languages**: Python, C, C++, Java, JavaScript (Node.js), TypeScript, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Bash, SQL, and dynamically discovered compilers via `GET /api/code/languages`.
 - **Dynamic Language Resolution**: Automatic alias normalization (`c++`, `cpp`, `py`, `python3`, `node`, `golang`, etc.) with active compiler version preference.
 - **Strict Sandboxed Security**: All code runs in external Linux sandbox containers. Arbitrary code is NEVER executed on the EduMentor AI backend host.
 
 ### 3. 📺 AI-Powered Duration-Aware YouTube Learning Video Recommendation
-- **Architecture**:
-  $$\text{AI Agent} \rightarrow \text{find\_learning\_video Tool} \rightarrow \text{YouTubeService} \rightarrow \text{YouTube Data API v3}$$
+- **Architecture Flow**:
+  > `AI Agent` ➔ `find_learning_video Tool` ➔ `YouTubeService` ➔ `YouTube Data API v3`
 - **Exact Duration Awareness**: Parses exact ISO 8601 durations (`PT21M14S` $\rightarrow$ 21:14) and respects student time constraints:
   - `exact` / `around`: Scores candidates based on duration proximity (e.g., "recursion in 20 minutes").
   - `under`: Strictly rejects any video exceeding the limit (e.g., "under 20 minutes").
