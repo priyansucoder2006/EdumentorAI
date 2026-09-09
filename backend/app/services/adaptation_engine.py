@@ -48,8 +48,9 @@ class AdaptationEngine:
             root_cause_text = misconception.root_cause or "a foundational concept gap"
             misc_title = misconception.misconception_title or "Key Principle Intuition"
 
+            eval_lead = f"{evaluation.feedback}\n\n" if evaluation.feedback else ""
             remedial = (
-                f"I noticed a subtle conceptual gap: {root_cause_text}.\n\n"
+                f"{eval_lead}I noticed a subtle conceptual gap: {root_cause_text}.\n\n"
                 f"💡 **Intuition Analogy**: {analogy_text}\n\n"
                 f"Let's test this intuition with a simplified follow-up checkpoint!"
             )
@@ -93,8 +94,9 @@ class AdaptationEngine:
             missing_text = ", ".join(evaluation.missing_concepts) if evaluation.missing_concepts else "a key subtlety"
             example_text = current_step_data.get("example") or f"a standard application of {current_step_concept}"
 
+            eval_lead = f"{evaluation.feedback}\n\n" if evaluation.feedback else ""
             remedial = (
-                f"You're making solid progress ({evaluation.reasoning_quality} reasoning), but missed: {missing_text}.\n\n"
+                f"{eval_lead}You're making solid progress ({evaluation.reasoning_quality} reasoning), but missed: {missing_text}.\n\n"
                 f"📌 **Concrete Example**: {example_text}\n\n"
                 f"Keep this in mind as we solidify the concept."
             )
@@ -135,19 +137,21 @@ class AdaptationEngine:
         # -------------------------------------------------------------
         elif score >= self.high_threshold:
             action = "increase_difficulty" if attempts_on_step > 1 else "continue"
+            praise_lead = f"{evaluation.feedback} " if evaluation.feedback else ""
             return AdaptiveDecisionOutput(
                 action=action,
                 rationale=f"High proficiency demonstrated (Score {score:.2f}, {evaluation.reasoning_quality} reasoning). Ready for advanced concepts.",
-                remedial_explanation=f"Outstanding mastery of {current_step_concept}! You demonstrated clear, rigorous understanding.",
+                remedial_explanation=f"{praise_lead}Outstanding mastery of {current_step_concept}! You demonstrated clear, rigorous understanding.",
                 new_mastery_estimate=min(100.0, 75.0 + score * 25.0)
             )
 
         # -------------------------------------------------------------
         # 4. Standard Progression (70% <= score < 85%) -> CONTINUE
         # -------------------------------------------------------------
+        praise_lead = f"{evaluation.feedback} " if evaluation.feedback else ""
         return AdaptiveDecisionOutput(
             action="continue",
             rationale=f"Satisfactory understanding demonstrated (Score {score:.2f}). Continuing curriculum.",
-            remedial_explanation=f"Great job on {current_step_concept}! Let's advance to the next step.",
+            remedial_explanation=f"{praise_lead}Great job on {current_step_concept}! Let's advance to the next step.",
             new_mastery_estimate=max(70.0, score * 100.0)
         )

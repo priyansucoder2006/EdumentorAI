@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Type, TypeVar, Optional, Dict, Any, List
 from pydantic import BaseModel
 from app.ai.providers.base import BaseLLMProvider
@@ -76,20 +77,29 @@ class MockPedagogicalProvider(BaseLLMProvider):
         elif "bengali" in prompt_lower or "bn" in prompt_lower:
             lang = "bn"
 
+        # Extract explicit topic from prompt if present
+        topic_target = ""
+        for line in prompt.split("\n"):
+            if line.strip().lower().startswith("topic:"):
+                topic_target = line.split(":", 1)[1].strip().lower()
+                break
+        
+        search_target = topic_target or prompt_lower
+
         # Topic: Newton's Laws (Flagship Demonstration & Test Scenario)
-        if "newton" in prompt_lower or "force" in prompt_lower or "motion" in prompt_lower:
+        if any(k in search_target for k in ["newton", "inertia", "motion", "gravity"]):
             return self._build_newtons_laws_plan(duration, lang)
         
         # Topic: React / Web Development
-        if "react" in prompt_lower or "frontend" in prompt_lower or "component" in prompt_lower:
+        if any(k in search_target for k in ["react", "frontend", "component"]):
             return self._build_react_plan(duration, lang)
 
         # Topic: Ohm's Law / Electricity
-        if "ohm" in prompt_lower or "circuit" in prompt_lower or "electricity" in prompt_lower:
+        if any(k in search_target for k in ["ohm", "circuit", "electricity", "voltage", "current"]):
             return self._build_ohms_law_plan(duration, lang)
 
         # Topic: Machine Learning / AI
-        if "machine learning" in prompt_lower or "artificial intelligence" in prompt_lower or "ai" in prompt_lower:
+        if any(k in search_target for k in ["machine learning", "artificial intelligence", "deep learning", "neural network"]) or re.search(r"\b(ai|ml)\b", search_target):
             return self._build_ml_plan(duration, lang)
 
         # Generic Subject Plan
@@ -445,9 +455,18 @@ class MockPedagogicalProvider(BaseLLMProvider):
         }
 
     def _evaluate_mock_answer(self, prompt: str, prompt_lower: str) -> Dict[str, Any]:
-        # Detect student answers indicating misconceptions or wrong ideas
+        # Extract concept if present
+        concept_name = "this concept"
+        student_ans = ""
+        for line in prompt.split("\n"):
+            line_l = line.lower().strip()
+            if line_l.startswith("concept:"):
+                concept_name = line.split(":", 1)[1].strip()
+            elif line_l.startswith("student answer:"):
+                student_ans = line.split(":", 1)[1].strip()
+
         is_wrong = False
-        feedback = "Excellent! You explained the core concept clearly and accurately."
+        feedback = f"Excellent! Your answer directly demonstrates the core principles of {concept_name}."
         score = 1.0
         missing = []
         reasoning = "excellent"
@@ -464,14 +483,15 @@ class MockPedagogicalProvider(BaseLLMProvider):
             "voltage consumed",
             "current increases with resistance",
             "props can be modified",
-            "directly mutate"
+            "directly mutate",
+            "mitochondria"
         ]
 
         if any(kw in prompt_lower for kw in wrong_keywords) or "option 2" in prompt_lower or "option 3" in prompt_lower or "incorrect" in prompt_lower:
             is_wrong = True
             score = 0.25
-            feedback = "Not quite. There is a common misconception in your reasoning regarding how forces and motion interact."
-            missing = ["Inertia of motion", "Frictional forces vs inherent momentum"]
+            feedback = f"Not quite. There is a conceptual gap in how you analyzed {concept_name}—make sure to differentiate between primary causes and secondary effects."
+            missing = [f"Foundational rules of {concept_name}"]
             reasoning = "poor"
 
         return {

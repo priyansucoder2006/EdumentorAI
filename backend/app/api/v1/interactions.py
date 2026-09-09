@@ -1,11 +1,17 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.user import User
 from app.models.lesson import Lesson, LessonStep
 from app.models.interaction import Interaction
-from app.schemas.interaction import AnswerSubmitRequest, InteractionResponse
+from app.schemas.interaction import (
+    AnswerSubmitRequest,
+    InteractionResponse,
+    AskTeacherDoubtRequest,
+    AskTeacherDoubtResponse,
+)
+from app.ai.providers import get_llm_provider
 from app.ai.agents.evaluator_agent import EvaluatorAgent
 from app.ai.agents.misconception_agent import MisconceptionAgent
 from app.services.adaptation_engine import AdaptationEngine
@@ -173,3 +179,38 @@ def get_lesson_interactions(
             )
         )
     return res
+
+
+@router.post("/ask", response_model=AskTeacherDoubtResponse)
+async def ask_teacher_doubt(
+    req: AskTeacherDoubtRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    lesson = db.query(Lesson).filter(Lesson.id == req.lesson_id, Lesson.user_id == current_user.id).first()
+    if not lesson:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found.")
+
+    step = None
+    if req.step_id:
+        step = db.query(LessonStep).filter(LessonStep.id == req.step_id).first()
+    if not step and lesson.steps:
+        step = lesson.steps[lesson.current_step_index] if lesson.current_step_index < len(lesson.steps) else lesson.steps[0]
+
+    concept = step.concept if step else lesson.topic
+    explanation = step.explanation if step else ""
+
+    llm = get_llm_provider()
+    system_prompt = (
+        f"You are Prof. Elena, an inspiring, empathetic, and brilliant AI Master Teacher. "
+        f"The student is currently learning '{lesson.topic}', focusing on the concept '{concept}'. "
+        f"Concept background: {explanation}. "
+        f"Answer the student's question clearly, warmly, and concisely in 2-3 sentences with an intuitive analogy or concrete example. "
+        f"Respond in {req.language}."
+    )
+    user_prompt = f"Student Question: {req.question}"
+    answer = await llm.generate_text(prompt=user_prompt, system_prompt=system_prompt)
+    if not answer or answer.strip() == "":
+        answer = f"That is an insightful question about {concept}! In simple terms, {concept} ensures that the system behaves predictably based on the underlying fundamental principles."
+
+    return AskTeacherDoubtResponse(answer=answer, concept=concept)

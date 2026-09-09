@@ -45,6 +45,14 @@ export const ClassroomPage: React.FC = () => {
   const [showYtModal, setShowYtModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Dynamic Teacher Dialogue and Doubt states
+  const [teacherDialogueTitle, setTeacherDialogueTitle] = useState<string>('AI Teacher Explanation');
+  const [teacherDialogueText, setTeacherDialogueText] = useState<string>('');
+  const [teacherDialogueAnalogy, setTeacherDialogueAnalogy] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'concept' | 'feedback' | 'ask'>('concept');
+  const [doubtInput, setDoubtInput] = useState<string>('');
+  const [isAskingDoubt, setIsAskingDoubt] = useState<boolean>(false);
+
   // Load lesson
   useEffect(() => {
     if (!id) return;
@@ -73,14 +81,23 @@ export const ClassroomPage: React.FC = () => {
 
   // Auto-speak on step change if voice enabled
   useEffect(() => {
-    if (currentStep && isVoiceEnabled) {
-      setTeacherMood('explaining');
-      setPedagogicalState('EXPLAINING');
-      const speechText = `${currentStep.concept}. ${currentStep.explanation} ${currentStep.analogy ? `Think of it like this: ${currentStep.analogy}` : ''}`;
-      voiceManager.speak(speechText, lesson?.language || 'en', () => {
-        setTeacherMood('questioning');
-        setPedagogicalState('CHECKING_UNDERSTANDING');
-      });
+    if (currentStep) {
+      setTeacherDialogueTitle('AI Teacher Explanation');
+      setTeacherDialogueText(currentStep.explanation);
+      setTeacherDialogueAnalogy(currentStep.analogy || null);
+      setActiveTab('concept');
+      setActiveMisconception(null);
+      setAdaptiveDecision(null);
+
+      if (isVoiceEnabled) {
+        setTeacherMood('explaining');
+        setPedagogicalState('EXPLAINING');
+        const speechText = `${currentStep.concept}. ${currentStep.explanation} ${currentStep.analogy ? `Think of it like this: ${currentStep.analogy}` : ''}`;
+        voiceManager.speak(speechText, lesson?.language || 'en', () => {
+          setTeacherMood('questioning');
+          setPedagogicalState('CHECKING_UNDERSTANDING');
+        });
+      }
     }
   }, [currentStepIndex, lesson?.language]);
 
@@ -90,8 +107,9 @@ export const ClassroomPage: React.FC = () => {
       setIsVoiceEnabled(false);
     } else {
       setIsVoiceEnabled(true);
-      if (currentStep) {
-        voiceManager.speak(currentStep.explanation, lesson?.language || 'en');
+      const textToSpeak = teacherDialogueText || currentStep?.explanation;
+      if (textToSpeak) {
+        voiceManager.speak(textToSpeak, lesson?.language || 'en');
       }
     }
   };
@@ -109,9 +127,20 @@ export const ClassroomPage: React.FC = () => {
       });
 
       setCurrentMastery(interaction.current_mastery);
+      setAdaptiveDecision(interaction.adaptive_decision);
+
+      const evalFeedback = interaction.evaluation?.feedback || '';
+      const remedialText = interaction.adaptive_decision?.remedial_explanation || '';
+      const fullResponse = evalFeedback && remedialText
+        ? `${evalFeedback}\n\n${remedialText}`
+        : (evalFeedback || remedialText || 'Good effort on this checkpoint!');
 
       if (interaction.evaluation.is_correct) {
-        // Praise student & check for higher difficulty
+        setTeacherDialogueTitle('Prof. Elena: Great Insight!');
+        setTeacherDialogueText(fullResponse);
+        setTeacherDialogueAnalogy(null);
+        setActiveTab('feedback');
+
         if (interaction.evaluation.score >= 0.85) {
           setPedagogicalState('MASTERY_ACHIEVED');
           setTeacherMood('praising');
@@ -120,28 +149,62 @@ export const ClassroomPage: React.FC = () => {
           setTeacherMood('praising');
         }
         setActiveMisconception(null);
-        setAdaptiveDecision(interaction.adaptive_decision);
+
         if (isVoiceEnabled) {
-          voiceManager.speak(
-            interaction.adaptive_decision?.remedial_explanation || 'Excellent explanation! You captured the core foundational principle.',
-            lesson.language
-          );
+          voiceManager.speak(fullResponse, lesson.language);
         }
       } else {
-        // Misconception Diagnosed & Adaptive Reteach
+        setTeacherDialogueTitle('Prof. Elena: Conceptual Guidance');
+        setTeacherDialogueText(fullResponse);
+        setTeacherDialogueAnalogy(interaction.misconception?.pedagogical_analogy || null);
+        setActiveTab('feedback');
+
         setPedagogicalState('DIAGNOSING');
         setTimeout(() => setPedagogicalState('RE_TEACHING'), 800);
         setTeacherMood('remedial');
         setActiveMisconception(interaction.misconception);
-        setAdaptiveDecision(interaction.adaptive_decision);
-        if (isVoiceEnabled && interaction.adaptive_decision.remedial_explanation) {
-          voiceManager.speak(interaction.adaptive_decision.remedial_explanation, lesson.language);
+
+        if (isVoiceEnabled) {
+          voiceManager.speak(fullResponse, lesson.language);
         }
       }
     } catch (err) {
       console.error('Answer evaluation error:', err);
     } finally {
       setIsSubmittingAnswer(false);
+    }
+  };
+
+  const handleAskDoubt = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!doubtInput.trim() || !lesson || isAskingDoubt) return;
+
+    const questionText = doubtInput.trim();
+    setDoubtInput('');
+    setIsAskingDoubt(true);
+    setTeacherMood('explaining');
+
+    try {
+      const res = await lessonService.askTeacher({
+        lesson_id: lesson.id,
+        step_id: currentStep?.id,
+        question: questionText,
+        language: lesson.language || 'en',
+      });
+
+      setTeacherDialogueTitle(`Prof. Elena: Doubt Cleared`);
+      setTeacherDialogueText(`**Q:** "${questionText}"\n\n**Prof. Elena:** ${res.answer}`);
+      setTeacherDialogueAnalogy(null);
+      setActiveTab('feedback');
+
+      if (isVoiceEnabled) {
+        voiceManager.speak(res.answer, lesson.language || 'en');
+      }
+    } catch (err) {
+      console.error('Error asking doubt:', err);
+      setTeacherDialogueText('I apologize, I had a momentary connection issue. Please feel free to ask again!');
+    } finally {
+      setIsAskingDoubt(false);
     }
   };
 
@@ -278,18 +341,97 @@ export const ClassroomPage: React.FC = () => {
               currentConcept={currentStep.concept}
             />
 
-            {/* Explanation Dialogue Box */}
-            <div className="teacher-speech-bubble">
-              <div className="bubble-header">
-                <Sparkles size={14} className="text-blue-400" />
-                <span>AI Teacher Explanation</span>
-              </div>
-              <p className="bubble-text">{currentStep.explanation}</p>
-              {currentStep.analogy && (
-                <div className="bubble-analogy">
-                  <Lightbulb size={16} className="text-amber-400 flex-shrink-0" />
-                  <span><strong>Intuition:</strong> {currentStep.analogy}</span>
+            {/* Dynamic Teacher Dialogue Box with Tabs */}
+            <div className="teacher-speech-bubble bg-slate-800/90 border border-slate-700/80 rounded-xl p-4 shadow-xl">
+              <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-700/60">
+                <div className="flex items-center gap-2">
+                  <Sparkles size={16} className="text-blue-400" />
+                  <span className="font-semibold text-sm text-slate-200">{teacherDialogueTitle}</span>
                 </div>
+                <div className="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-lg border border-slate-700/50 text-xs">
+                  <button
+                    type="button"
+                    className={`px-2 py-0.5 rounded transition-colors ${activeTab === 'concept' ? 'bg-blue-600 text-white font-medium' : 'text-slate-400 hover:text-slate-200'}`}
+                    onClick={() => setActiveTab('concept')}
+                  >
+                    Concept
+                  </button>
+                  <button
+                    type="button"
+                    className={`px-2 py-0.5 rounded transition-colors ${activeTab === 'feedback' ? 'bg-indigo-600 text-white font-medium' : 'text-slate-400 hover:text-slate-200'}`}
+                    onClick={() => setActiveTab('feedback')}
+                  >
+                    Teacher Feedback
+                  </button>
+                  <button
+                    type="button"
+                    className={`px-2 py-0.5 rounded transition-colors ${activeTab === 'ask' ? 'bg-cyan-600 text-white font-medium' : 'text-slate-400 hover:text-slate-200'}`}
+                    onClick={() => setActiveTab('ask')}
+                  >
+                    Ask Doubt
+                  </button>
+                </div>
+              </div>
+
+              {/* Tab 1: Concept Explanation */}
+              {activeTab === 'concept' && (
+                <div>
+                  <p className="bubble-text text-sm leading-relaxed text-slate-300">{currentStep.explanation}</p>
+                  {currentStep.analogy && (
+                    <div className="bubble-analogy mt-3 flex items-start gap-2.5 bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-lg text-amber-200 text-xs">
+                      <Lightbulb size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
+                      <span><strong>Intuition:</strong> {currentStep.analogy}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Tab 2: Dynamic Teacher Feedback / Dialogue */}
+              {activeTab === 'feedback' && (
+                <div>
+                  <div className="text-sm leading-relaxed text-slate-200 whitespace-pre-line bg-slate-900/60 p-3 rounded-lg border border-slate-700/50">
+                    {teacherDialogueText || "Submit your answer below to receive personalized guidance and feedback from Prof. Elena!"}
+                  </div>
+                  {teacherDialogueAnalogy && (
+                    <div className="mt-2.5 flex items-start gap-2 bg-indigo-500/10 border border-indigo-500/20 p-2.5 rounded-lg text-indigo-200 text-xs">
+                      <Lightbulb size={15} className="text-indigo-400 flex-shrink-0 mt-0.5" />
+                      <span><strong>Remedial Intuition:</strong> {teacherDialogueAnalogy}</span>
+                    </div>
+                  )}
+                  {teacherDialogueText && (
+                    <button
+                      type="button"
+                      onClick={() => voiceManager.speak(teacherDialogueText, lesson.language || 'en')}
+                      className="mt-2 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+                    >
+                      <Volume2 size={13} /> Listen to Prof. Elena again
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Tab 3: Ask Prof. Elena a Doubt */}
+              {activeTab === 'ask' && (
+                <form onSubmit={handleAskDoubt} className="mt-1">
+                  <p className="text-xs text-slate-400 mb-2">Have a question or confusion about <strong>{currentStep.concept}</strong>? Ask Prof. Elena directly:</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      className="flex-1 bg-slate-900/90 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                      placeholder="e.g., Why doesn't the normal force cancel gravity here?"
+                      value={doubtInput}
+                      onChange={(e) => setDoubtInput(e.target.value)}
+                      disabled={isAskingDoubt}
+                    />
+                    <button
+                      type="submit"
+                      disabled={!doubtInput.trim() || isAskingDoubt}
+                      className="px-3 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow transition-colors"
+                    >
+                      <span>{isAskingDoubt ? 'Thinking...' : 'Ask'}</span>
+                    </button>
+                  </div>
+                </form>
               )}
             </div>
 

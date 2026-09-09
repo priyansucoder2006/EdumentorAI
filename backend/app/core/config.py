@@ -19,8 +19,8 @@ class Settings(BaseSettings):
     MONGODB_DB_NAME: str = "edumentor_db"
 
     # AI Providers
-    LLM_PROVIDER: str = "mock"  # "mock", "openai", "gemini", "groq"
-    LLM_MODEL: str = "gemini-2.0-flash"
+    LLM_PROVIDER: str = "groq"  # "mock", "openai", "gemini", "groq"
+    LLM_MODEL: str = "openai/gpt-oss-20b"
     LLM_API_KEY: str = ""
     GROQ_API_KEY: str = ""
     

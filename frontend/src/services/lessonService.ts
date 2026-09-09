@@ -54,6 +54,18 @@ export const lessonService = {
     return apiRequest<Interaction[]>(`/interactions/${lessonId}`);
   },
 
+  askTeacher: async (data: {
+    lesson_id: string;
+    step_id?: string;
+    question: string;
+    language?: string;
+  }): Promise<{ answer: string; concept: string }> => {
+    return apiRequest<{ answer: string; concept: string }>('/interactions/ask', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
   generateAssessment: async (lessonId: string): Promise<Assessment> => {
     return apiRequest<Assessment>('/assessments/generate', {
       method: 'POST',

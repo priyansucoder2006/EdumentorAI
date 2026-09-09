@@ -50,3 +50,15 @@ class InteractionResponse(BaseModel):
     confidence: float
     current_mastery: float
     created_at: datetime
+
+
+class AskTeacherDoubtRequest(BaseModel):
+    lesson_id: str
+    step_id: Optional[str] = None
+    question: str
+    language: str = "en"
+
+
+class AskTeacherDoubtResponse(BaseModel):
+    answer: str
+    concept: str
