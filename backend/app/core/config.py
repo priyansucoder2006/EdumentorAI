@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str = "mock"  # "mock", "openai", "gemini", "groq"
     LLM_MODEL: str = "gemini-2.0-flash"
     LLM_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
     
     # Embeddings
     EMBEDDING_PROVIDER: str = "local"  # "local", "openai", "mock"

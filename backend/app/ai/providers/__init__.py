@@ -8,11 +8,12 @@ from app.core.config import settings
 
 def get_llm_provider() -> BaseLLMProvider:
     provider = settings.LLM_PROVIDER.lower()
-    if provider == "gemini" and settings.LLM_API_KEY:
-        return GeminiProvider(api_key=settings.LLM_API_KEY, model=settings.LLM_MODEL)
-    elif (provider == "openai" or provider == "groq") and settings.LLM_API_KEY:
+    api_key = settings.LLM_API_KEY or settings.GROQ_API_KEY
+    if provider == "gemini" and api_key:
+        return GeminiProvider(api_key=api_key, model=settings.LLM_MODEL)
+    elif (provider == "openai" or provider == "groq") and api_key:
         base_url = "https://api.groq.com/openai/v1" if provider == "groq" else "https://api.openai.com/v1"
-        return OpenAIProvider(api_key=settings.LLM_API_KEY, model=settings.LLM_MODEL, base_url=base_url)
+        return OpenAIProvider(api_key=api_key, model=settings.LLM_MODEL, base_url=base_url)
     return MockPedagogicalProvider()
 
 
