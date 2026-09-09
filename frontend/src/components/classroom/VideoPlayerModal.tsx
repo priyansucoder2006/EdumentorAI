@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { videoService, VideoJob } from '../../services/videoService';
+import { getMediaUrl } from '../../services/api';
 import { X, Play, Pause, Video, Sparkles, AlertCircle, Download, CheckCircle2, Volume2, VolumeX, RotateCcw } from 'lucide-react';
 
 interface VideoPlayerModalProps {
@@ -169,7 +170,7 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
                   className="w-full h-full object-contain"
-                  src={job.video_url.startsWith('http') ? job.video_url : `http://localhost:8000${job.video_url}`}
+                  src={getMediaUrl(job.video_url)}
                 >
                   Your browser does not support the video tag.
                 </video>
@@ -229,7 +230,7 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
                   <span>Production H.264 MP4 with animated avatar & synchronized voice narration</span>
                 </div>
                 <a
-                  href={job.video_url.startsWith('http') ? job.video_url : `http://localhost:8000${job.video_url}`}
+                  href={getMediaUrl(job.video_url)}
                   download
                   target="_blank"
                   rel="noreferrer"
