@@ -22,3 +22,5 @@ gTTS>=2.5.0
 edge-tts>=6.1.0
 imageio>=2.34.0
 imageio-ffmpeg>=0.4.9
+email-validator>=2.0.0
+pillow>=10.0.0
