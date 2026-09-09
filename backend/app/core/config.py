@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = "sqlite:///./edumentor.db"
-    MONGODB_URL: str = "mongodb+srv://cpriyansu8_db_user:3fPROaia4QVnmWd4@cluster0.u7ive4r.mongodb.net/?retryWrites=true&w=majority"
+    MONGODB_URL: str = ""
     MONGODB_DB_NAME: str = "edumentor_db"
 
     # AI Providers
