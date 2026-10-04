@@ -86,4 +86,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        sync: false
+        value: "https://edumentor-backend-ma4l.onrender.com/api"

@@ -86,6 +86,12 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
+        {loading && (
+          <div className="text-xs text-center text-blue-300 animate-pulse my-2 bg-blue-500/10 py-2 px-3 rounded-lg border border-blue-500/20">
+            ⏳ Connecting to EduMentor AI backend... Please wait (Render free tier may take 15–30s if waking up from idle).
+          </div>
+        )}
+
         <button
           type="button"
           onClick={handleDemoAccess}

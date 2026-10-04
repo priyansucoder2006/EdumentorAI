@@ -21,7 +21,7 @@ export const LessonCreatorPage: React.FC = () => {
 
   const stateData = (location.state as any) || {};
 
-  const [topic, setTopic] = useState<string>(stateData.topic || "Newton's Laws of Motion");
+  const [topic, setTopic] = useState<string>(stateData.topic || '');
   const [duration, setDuration] = useState<number>(stateData.duration_minutes || 20);
   const [language, setLanguage] = useState<string>('hinglish');
   const [difficulty, setDifficulty] = useState<string>('beginner');
@@ -35,6 +35,18 @@ export const LessonCreatorPage: React.FC = () => {
   useEffect(() => {
     documentService.getDocuments().then(setDocuments).catch(console.warn);
   }, []);
+
+  useEffect(() => {
+    if (location.state?.topic) {
+      setTopic(location.state.topic);
+    }
+    if (location.state?.duration_minutes) {
+      setDuration(location.state.duration_minutes);
+    }
+    if (location.state?.document_id) {
+      setSelectedDocId(location.state.document_id);
+    }
+  }, [location.state]);
 
   const handleCreateLesson = async (e: React.FormEvent) => {
     e.preventDefault();
