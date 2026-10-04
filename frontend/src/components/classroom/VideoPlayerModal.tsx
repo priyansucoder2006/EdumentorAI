@@ -62,6 +62,14 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
     };
   }, [lessonId]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const handleVideoLoaded = () => {
     if (videoRef.current) {
       videoRef.current.volume = 1.0;
@@ -126,8 +134,14 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
   const displayProgress = isCompleted ? 100 : Math.max(5, progress);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+    <div
+      className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 overflow-y-auto animate-fade-in"
+      onClick={onClose}
+    >
+      <div
+        className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] my-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
           <div className="flex items-center gap-3">
