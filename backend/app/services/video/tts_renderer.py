@@ -17,15 +17,11 @@ class TTSRenderer:
 
     VOICE_MAP = {
         "en": "en-US-JennyNeural",
-        "hi": "hi-IN-SwaraNeural",
-        "hinglish": "hi-IN-MadhurNeural",
         "bn": "bn-IN-TanishaaNeural"
     }
 
     GTTS_LANG_MAP = {
         "en": "en",
-        "hi": "hi",
-        "hinglish": "hi",
         "bn": "bn"
     }
 

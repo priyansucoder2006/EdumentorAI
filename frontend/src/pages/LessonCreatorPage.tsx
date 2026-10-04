@@ -23,7 +23,7 @@ export const LessonCreatorPage: React.FC = () => {
 
   const [topic, setTopic] = useState<string>(stateData.topic || '');
   const [duration, setDuration] = useState<number>(stateData.duration_minutes || 20);
-  const [language, setLanguage] = useState<string>('hinglish');
+  const [language, setLanguage] = useState<string>('en');
   const [difficulty, setDifficulty] = useState<string>('beginner');
   const [targetAudience, setTargetAudience] = useState<string>('Class 8 student');
   const [learningGoal, setLearningGoal] = useState<string>('mastery');
@@ -75,9 +75,9 @@ export const LessonCreatorPage: React.FC = () => {
   };
 
   const samplePresets = [
-    { topic: "Newton's Laws of Motion", level: 'beginner', aud: 'Class 8 student', lang: 'hinglish', dur: 20 },
+    { topic: "Newton's Laws of Motion", level: 'beginner', aud: 'Class 8 student', lang: 'en', dur: 20 },
     { topic: 'React Components & State Management', level: 'intermediate', aud: 'Frontend Developer', lang: 'en', dur: 20 },
-    { topic: "Ohm's Law & Electric Circuits", level: 'beginner', aud: 'High School Physics', lang: 'hi', dur: 5 },
+    { topic: "Ohm's Law & Electric Circuits (বাংলা)", level: 'beginner', aud: 'High School Physics', lang: 'bn', dur: 5 },
     { topic: 'Machine Learning Fundamentals', level: 'intermediate', aud: 'CS Undergrad', lang: 'en', dur: 60 },
   ];
 
@@ -171,9 +171,7 @@ export const LessonCreatorPage: React.FC = () => {
             <div className="form-group">
               <label><Globe size={16} /> Language</label>
               <select value={language} onChange={(e) => setLanguage(e.target.value)}>
-                <option value="hinglish">Hinglish (Hindi + English)</option>
                 <option value="en">English</option>
-                <option value="hi">हिन्दी (Hindi)</option>
                 <option value="bn">বাংলা (Bengali)</option>
               </select>
             </div>

@@ -102,7 +102,7 @@ export const DashboardPage: React.FC = () => {
           <p>
             Your AI teacher is ready. Teaching level calibrated to{' '}
             <strong>{profile?.knowledge_level || 'Beginner'}</strong> in{' '}
-            <strong>{user?.preferred_language?.toUpperCase() || 'HINGLISH'}</strong>.
+            <strong>{user?.preferred_language?.toLowerCase() === 'bn' ? 'BENGALI (বাংলা)' : 'ENGLISH'}</strong>.
           </p>
 
           {/* Quick Launch Search */}

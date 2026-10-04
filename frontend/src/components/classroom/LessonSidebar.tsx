@@ -22,8 +22,6 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
 
   const languages = [
     { code: 'en', label: 'English' },
-    { code: 'hinglish', label: 'Hinglish' },
-    { code: 'hi', label: 'हिन्दी (Hindi)' },
     { code: 'bn', label: 'বাংলা (Bengali)' },
   ];
 

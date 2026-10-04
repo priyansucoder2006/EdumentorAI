@@ -110,9 +110,7 @@ export class VoiceService {
     }
 
     const langLower = language.toLowerCase();
-    const isHinglish = langLower === 'hinglish';
-    const isHindi = langLower === 'hi' || langLower.startsWith('hi-');
-    const isBengali = langLower === 'bn' || langLower.startsWith('bn-');
+    const isBengali = langLower === 'bn' || langLower.startsWith('bn');
 
     // List of known robotic or male voices to strictly deprioritize
     const isRoboticOrMale = (name: string): boolean => {
@@ -135,8 +133,6 @@ export class VoiceService {
         n.includes('female') ||
         n.includes('aria') ||
         n.includes('jenny') ||
-        n.includes('neerja') ||
-        n.includes('swara') ||
         n.includes('zira') ||
         n.includes('samantha') ||
         n.includes('karen') ||
@@ -144,59 +140,25 @@ export class VoiceService {
         n.includes('moira') ||
         n.includes('elena') ||
         n.includes('siri') ||
-        n.includes('kalpana') ||
+        n.includes('tanishaa') ||
         n.includes('natural')
       );
     };
 
-    // Case A: Hinglish - Needs Indian English natural female voice so both English & Hindi sound crystal clear
-    if (isHinglish) {
-      // 1. Microsoft Neerja (Online Natural Indian English) or Google Indian English
-      const indianFemale = allVoices.find(
-        (v) =>
-          (v.lang.startsWith('en-IN') || v.name.toLowerCase().includes('india')) &&
-          isFemale(v.name) &&
-          !isRoboticOrMale(v.name)
-      );
-      if (indianFemale) return indianFemale;
-
-      // 2. Any en-IN voice
-      const anyIndian = allVoices.find((v) => v.lang.startsWith('en-IN') && !isRoboticOrMale(v.name));
-      if (anyIndian) return anyIndian;
-
-      // 3. Fallback to top-tier Natural English female voice
-      const premiumFemale = allVoices.find(
-        (v) =>
-          (v.name.toLowerCase().includes('aria') ||
-            v.name.toLowerCase().includes('jenny') ||
-            v.name.toLowerCase().includes('google uk english female') ||
-            v.name.toLowerCase().includes('samantha')) &&
-          !isRoboticOrMale(v.name)
-      );
-      if (premiumFemale) return premiumFemale;
-    }
-
-    // Case B: Hindi (Pure Hindi)
-    if (isHindi) {
-      const hindiFemale = allVoices.find(
-        (v) =>
-          (v.lang.startsWith('hi') || v.name.toLowerCase().includes('hindi')) &&
-          isFemale(v.name) &&
-          !isRoboticOrMale(v.name)
-      );
-      if (hindiFemale) return hindiFemale;
-
-      const anyHindi = allVoices.find((v) => v.lang.startsWith('hi'));
-      if (anyHindi) return anyHindi;
-    }
-
-    // Case C: Bengali
+    // Case 1: Bengali (বাংলা)
     if (isBengali) {
-      const bengaliVoice = allVoices.find((v) => v.lang.startsWith('bn'));
+      const bengaliFemale = allVoices.find(
+        (v) => (v.lang.startsWith('bn') || v.name.toLowerCase().includes('bengali') || v.name.toLowerCase().includes('bangla')) && isFemale(v.name)
+      );
+      if (bengaliFemale) return bengaliFemale;
+
+      const bengaliVoice = allVoices.find(
+        (v) => v.lang.startsWith('bn') || v.name.toLowerCase().includes('bengali') || v.name.toLowerCase().includes('bangla')
+      );
       if (bengaliVoice) return bengaliVoice;
     }
 
-    // Case D: Standard English / Default: Prioritize natural female voices for Prof. Elena
+    // Case 2: English (Default) - Prioritize natural female voices for Prof. Elena
     // Priority order:
     // 1. Microsoft Aria Online (Natural)
     // 2. Microsoft Jenny Online (Natural)
@@ -307,12 +269,7 @@ export class VoiceService {
     } else {
       // Fallback language tag
       const langLower = language.toLowerCase();
-      if (langLower === 'hi') {
-        utterance.lang = 'hi-IN';
-      } else if (langLower === 'hinglish') {
-        // Indian English accent for Hinglish
-        utterance.lang = 'en-IN';
-      } else if (langLower === 'bn') {
+      if (langLower === 'bn' || langLower.startsWith('bn')) {
         utterance.lang = 'bn-IN';
       } else {
         utterance.lang = 'en-US';
@@ -398,11 +355,7 @@ export class VoiceService {
     }
 
     const langLower = language.toLowerCase();
-    if (langLower === 'hi') {
-      this.recognition.lang = 'hi-IN';
-    } else if (langLower === 'hinglish') {
-      this.recognition.lang = 'en-IN';
-    } else if (langLower === 'bn') {
+    if (langLower === 'bn' || langLower.startsWith('bn')) {
       this.recognition.lang = 'bn-IN';
     } else {
       this.recognition.lang = 'en-US';

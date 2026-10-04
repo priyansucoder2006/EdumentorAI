@@ -75,15 +75,17 @@ export const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
     setSettings(voiceManager.getVoiceSettings());
   };
 
-  // Curate recommended voices
+  // Curate recommended voices for English and Bengali
   const recommendedVoices = voices.filter((v) => {
     const n = v.name.toLowerCase();
+    const l = v.lang.toLowerCase();
     return (
+      l.startsWith('bn') ||
+      n.includes('bengali') ||
+      n.includes('bangla') ||
       n.includes('natural') ||
       n.includes('aria') ||
       n.includes('jenny') ||
-      n.includes('neerja') ||
-      n.includes('swara') ||
       n.includes('zira') ||
       n.includes('samantha') ||
       n.includes('victoria') ||

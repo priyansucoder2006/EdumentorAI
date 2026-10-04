@@ -7,7 +7,7 @@ export const RegisterPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [language, setLanguage] = useState('hinglish');
+  const [language, setLanguage] = useState('en');
   const [educationLevel, setEducationLevel] = useState('beginner');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -96,8 +96,6 @@ export const RegisterPage: React.FC = () => {
               <label><Globe size={14} /> Preferred Language</label>
               <select value={language} onChange={(e) => setLanguage(e.target.value)}>
                 <option value="en">English</option>
-                <option value="hinglish">Hinglish</option>
-                <option value="hi">हिन्दी (Hindi)</option>
                 <option value="bn">বাংলা (Bengali)</option>
               </select>
             </div>

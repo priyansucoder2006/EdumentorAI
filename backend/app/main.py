@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
                 name="Aarav Sharma",
                 email="student@edumentor.ai",
                 password_hash=get_password_hash("password123"),
-                preferred_language="hinglish",
+                preferred_language="en",
                 education_level="beginner"
             )
             db.add(demo_user)
@@ -52,7 +52,7 @@ async def lifespan(app: FastAPI):
                 preferred_depth="intuitive",
                 available_time=20,
                 learning_style="visual",
-                preferred_language="hinglish",
+                preferred_language="en",
                 strong_topics=["Speed & Velocity", "Linear Graphs"],
                 weak_topics=["Inertia", "Action-Reaction Pairs"]
             )

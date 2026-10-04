@@ -22,6 +22,8 @@ class LanguageAdapterService:
         current step index, mastery progress, state, and canonical formulas.
         """
         target_lang = target_language.lower()
+        if target_lang not in {"en", "bn"}:
+            target_lang = "en"
         if lesson.language and lesson.language.lower() == target_lang:
             return lesson
 
@@ -109,15 +111,16 @@ class LanguageAdapterService:
         shielded_text = re.sub(r'`[^`]+`', code_sub, shielded_text)
 
         # 2. Build translation prompt for LLM
-        prompt = f"""You are a master educational translator and multilingual science educator.
-Translate the following educational explanation into {target_language.upper()}.
+        lang_code = target_language.lower()
+        lang_name = "BENGALI (বাংলা)" if lang_code == "bn" else "ENGLISH"
+        prompt = f"""You are a master educational translator and educator.
+Translate the following educational explanation into {lang_name}.
 
 CRITICAL RULES:
 1. Preserve all placeholders like __MATH_EXPR_0__, __CODE_SNIPPET_0__ EXACTLY as they appear without translating them.
 2. Keep the pedagogical tone warm, engaging, and clear for a student.
-3. For Hinglish, use natural Hindi written in Roman English alphabet commonly used in Indian online education (e.g., 'Newton ka first law kehta hai ki...').
-4. For Hindi (hi), use standard Devanagari script.
-5. For Bengali (bn), use standard Bengali script.
+3. For Bengali (bn), use standard, natural Bengali script (বাংলা) with clear academic explanations.
+4. For English (en), use fluent, articulate, accessible English.
 
 Context: {context or 'Educational lesson explanation'}
 Input Text:
