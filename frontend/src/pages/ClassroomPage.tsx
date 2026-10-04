@@ -10,6 +10,7 @@ import { MisconceptionModal } from '../components/classroom/MisconceptionModal';
 import { LessonSidebar } from '../components/classroom/LessonSidebar';
 import { VideoPlayerModal } from '../components/classroom/VideoPlayerModal';
 import { YouTubeRecommendationModal } from '../components/classroom/YouTubeRecommendationModal';
+import { VoiceSettingsModal } from '../components/classroom/VoiceSettingsModal';
 import {
   Volume2,
   VolumeX,
@@ -25,6 +26,7 @@ import {
   Target,
   Award,
   Youtube,
+  Sliders,
 } from 'lucide-react';
 
 export const ClassroomPage: React.FC = () => {
@@ -43,6 +45,7 @@ export const ClassroomPage: React.FC = () => {
   const [teacherMood, setTeacherMood] = useState<'explaining' | 'questioning' | 'praising' | 'remedial'>('explaining');
   const [showVideoModal, setShowVideoModal] = useState<boolean>(false);
   const [showYtModal, setShowYtModal] = useState<boolean>(false);
+  const [showVoiceModal, setShowVoiceModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Dynamic Teacher Dialogue and Doubt states
@@ -326,6 +329,17 @@ export const ClassroomPage: React.FC = () => {
               {isVoiceEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
               <span>{isSpeaking ? 'Speaking...' : isVoiceEnabled ? 'Voice On' : 'Muted'}</span>
             </button>
+
+            {/* Voice Calibration & Settings */}
+            <button
+              type="button"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/90 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg text-xs font-medium shadow-md transition-all border border-slate-700"
+              onClick={() => setShowVoiceModal(true)}
+              title="Calibrate Prof. Elena's Voice and Tone"
+            >
+              <Sliders size={14} className="text-blue-400" />
+              <span>Voice Settings</span>
+            </button>
           </div>
         </div>
 
@@ -500,6 +514,13 @@ export const ClassroomPage: React.FC = () => {
           onClose={() => setShowYtModal(false)}
         />
       )}
+
+      {/* Voice Calibration Modal for Prof. Elena */}
+      <VoiceSettingsModal
+        isOpen={showVoiceModal}
+        onClose={() => setShowVoiceModal(false)}
+        language={lesson.language}
+      />
     </div>
   );
 };
