@@ -149,13 +149,13 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
               <Video size={20} />
             </div>
             <div>
-              <h3 className="font-semibold text-lg text-white">AI Master Video Lesson</h3>
+              <h3 className="font-semibold text-lg text-chocolate-500">AI Master Video Lesson</h3>
               <p className="text-xs text-slate-400">{lessonTopic}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-chocolate-500 hover:bg-slate-800 transition-colors"
           >
             <X size={20} />
           </button>
@@ -166,9 +166,9 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
           {error || isFailed ? (
             <div className="text-center max-w-md">
               <AlertCircle size={48} className="text-rose-400 mx-auto mb-3" />
-              <h4 className="text-lg font-medium text-white mb-1">Video Generation Failed</h4>
+              <h4 className="text-lg font-medium text-chocolate-500 mb-1">Video Generation Failed</h4>
               <p className="text-sm text-slate-400 mb-4">{error || job?.error_message || 'An error occurred during video rendering.'}</p>
-              <button onClick={onClose} className="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm">
+              <button onClick={onClose} className="px-4 py-2 bg-slate-800 text-chocolate-500 rounded-lg text-sm">
                 Close
               </button>
             </div>

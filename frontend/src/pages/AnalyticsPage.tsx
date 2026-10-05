@@ -89,13 +89,13 @@ export const AnalyticsPage: React.FC = () => {
           <div style={{ width: '100%', height: 280 }}>
             <ResponsiveContainer>
               <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} interval={0} angle={-15} textAnchor="end" />
-                <YAxis stroke="#94a3b8" domain={[0, 100]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(78,52,46,0.12)" />
+                <XAxis dataKey="name" stroke="#6D4C41" fontSize={11} interval={0} angle={-15} textAnchor="end" />
+                <YAxis stroke="#6D4C41" domain={[0, 100]} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', borderRadius: '8px', color: '#f8fafc' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#EAE1D2', borderRadius: '8px', color: '#4E342E' }}
                 />
-                <Bar dataKey="mastery" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="mastery" fill="#CC5500" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -107,10 +107,10 @@ export const AnalyticsPage: React.FC = () => {
           <div style={{ width: '100%', height: 280 }}>
             <ResponsiveContainer>
               <RadarChart data={chartData}>
-                <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                <PolarAngleAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
-                <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#64748b" />
-                <Radar name="Mastery" dataKey="mastery" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.4} />
+                <PolarGrid stroke="rgba(78,52,46,0.15)" />
+                <PolarAngleAxis dataKey="name" stroke="#4E342E" fontSize={11} />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#8D6E63" />
+                <Radar name="Mastery" dataKey="mastery" stroke="#CC5500" fill="#CC5500" fillOpacity={0.4} />
               </RadarChart>
             </ResponsiveContainer>
           </div>

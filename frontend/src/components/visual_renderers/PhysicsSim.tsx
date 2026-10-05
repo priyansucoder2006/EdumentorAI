@@ -82,17 +82,17 @@ export const PhysicsSim: React.FC<PhysicsSimProps> = ({
       <div className="sim-canvas-wrapper">
         <svg viewBox="0 0 520 180" className="sim-svg">
           {/* Air Track Bed */}
-          <rect x="20" y="110" width="480" height="16" rx="4" fill="#334155" />
-          <line x1="20" y1="126" x2="500" y2="126" stroke="#475569" strokeWidth="4" />
+          <rect x="20" y="110" width="480" height="16" rx="4" fill="#4E342E" />
+          <line x1="20" y1="126" x2="500" y2="126" stroke="#6D4C41" strokeWidth="4" />
           
           {/* Tick marks */}
           {[50, 100, 150, 200, 250, 300, 350, 400, 450].map((x) => (
-            <line key={x} x1={x} y1="110" x2={x} y2="118" stroke="#64748b" strokeWidth="2" />
+            <line key={x} x1={x} y1="110" x2={x} y2="118" stroke="#8D6E63" strokeWidth="2" />
           ))}
 
           {/* Glider / Physical Object */}
           <g transform={`translate(${position}, 70)`}>
-            <rect x="0" y="0" width="60" height="38" rx="6" fill="#3b82f6" stroke="#60a5fa" strokeWidth="2" />
+            <rect x="0" y="0" width="60" height="38" rx="6" fill="#CC5500" stroke="#B34700" strokeWidth="2" />
             <text x="30" y="24" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">
               {mass} kg
             </text>
@@ -105,10 +105,10 @@ export const PhysicsSim: React.FC<PhysicsSimProps> = ({
                   y1="0"
                   x2={Math.min(60, velocity * 10)}
                   y2="0"
-                  stroke="#10b981"
+                  stroke="#2E7D32"
                   strokeWidth="3"
                 />
-                <text x={Math.min(60, velocity * 10) + 6} y="4" fill="#10b981" fontSize="10" fontWeight="bold">
+                <text x={Math.min(60, velocity * 10) + 6} y="4" fill="#2E7D32" fontSize="10" fontWeight="bold">
                   v={velocity.toFixed(1)} m/s
                 </text>
               </g>
@@ -122,10 +122,10 @@ export const PhysicsSim: React.FC<PhysicsSimProps> = ({
                   y1="0"
                   x2={force * 8}
                   y2="0"
-                  stroke="#ef4444"
+                  stroke="#C62828"
                   strokeWidth="3"
                 />
-                <text x={force > 0 ? force * 8 + 6 : force * 8 - 30} y="-4" fill="#ef4444" fontSize="10" fontWeight="bold">
+                <text x={force > 0 ? force * 8 + 6 : force * 8 - 30} y="-4" fill="#C62828" fontSize="10" fontWeight="bold">
                   F={force} N
                 </text>
               </g>

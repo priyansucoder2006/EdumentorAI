@@ -40,7 +40,7 @@ export const RegisterPage: React.FC = () => {
       <div className="auth-card">
         <div className="auth-header">
           <div className="auth-icon-badge">
-            <GraduationCap size={28} className="text-blue-400" />
+            <GraduationCap size={28} className="text-[#CC5500]" />
           </div>
           <h2>Join EduMentor AI</h2>
           <p>Set up your profile to start personalized adaptive learning</p>

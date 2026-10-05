@@ -123,8 +123,8 @@ export const LearningPathsPage: React.FC = () => {
           <div className="flex items-center gap-2 text-cyan-400 font-semibold text-xs uppercase mb-1">
             <Compass size={16} /> Dynamic Curriculum Architect
           </div>
-          <h2 className="text-3xl font-bold text-white tracking-tight">Personalized Learning Roadmaps</h2>
-          <p className="text-slate-400 text-sm mt-1">
+          <h2 className="text-3xl font-bold text-chocolate-500 tracking-tight">Personalized Learning Roadmaps</h2>
+          <p className="text-chocolate-400 text-sm mt-1">
             Generate custom month-by-month and week-by-week curriculum trees specifying exact time commitments, concepts, and portfolio projects.
           </p>
         </div>
@@ -133,14 +133,14 @@ export const LearningPathsPage: React.FC = () => {
       {/* Grid: Generator Form & Saved Selector */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
         {/* Left Column: Roadmap Generator Form */}
-        <div className="lg:col-span-8 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
-          <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+        <div className="lg:col-span-8 bg-card border border-slate-700/80 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-4 border-b border-slate-700 pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-blue-600/20 text-blue-400">
+              <div className="p-2 rounded-lg bg-orange-brand/10 text-orange-brand">
                 <Sparkles size={20} />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">Generate Custom Curriculum Roadmap</h3>
+                <h3 className="text-lg font-semibold text-chocolate-500">Generate Custom Curriculum Roadmap</h3>
                 <p className="text-xs text-slate-400">Tell the AI what you want to master and how much time you have.</p>
               </div>
             </div>
@@ -183,7 +183,7 @@ export const LearningPathsPage: React.FC = () => {
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="e.g. Data Science, Machine Learning, Full-Stack React, Cybersecurity, Calculus"
-                className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm"
+                className="w-full px-4 py-2.5 bg-card border border-slate-700 rounded-xl text-chocolate-500 placeholder-slate-500 focus:outline-none focus:border-orange-brand text-sm"
               />
             </div>
 
@@ -253,7 +253,7 @@ export const LearningPathsPage: React.FC = () => {
                 <select
                   value={currentLevel}
                   onChange={(e) => setCurrentLevel(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-card border border-slate-700 rounded-xl text-chocolate-500 text-xs focus:outline-none focus:border-orange-brand"
                 >
                   <option value="beginner">Beginner (Zero / Fundamental knowledge)</option>
                   <option value="intermediate">Intermediate (Foundational proficiency)</option>
@@ -268,7 +268,7 @@ export const LearningPathsPage: React.FC = () => {
                 <select
                   value={learningGoal}
                   onChange={(e) => setLearningGoal(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-card border border-slate-700 rounded-xl text-chocolate-500 text-xs focus:outline-none focus:border-orange-brand"
                 >
                   <option value="career">Job Ready / Career Switch</option>
                   <option value="projects">Build Real-World Portfolio Projects</option>
@@ -281,7 +281,7 @@ export const LearningPathsPage: React.FC = () => {
             <button
               type="submit"
               disabled={isGenerating}
-              className="w-full mt-2 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl font-semibold text-sm shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+              className="w-full mt-2 py-3 bg-gradient-to-r from-burntOrange-600 to-burntOrange-500 hover:from-burntOrange-700 hover:to-burntOrange-600 text-white rounded-xl font-semibold text-sm shadow-lg shadow-burntOrange-500/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
             >
               {isGenerating ? (
                 <>
@@ -300,12 +300,12 @@ export const LearningPathsPage: React.FC = () => {
         </div>
 
         {/* Right Column: Saved Roadmaps Navigation */}
-        <div className="lg:col-span-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col">
-          <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-              <Layers size={16} className="text-blue-400" /> Your Active Roadmaps
+        <div className="lg:col-span-4 bg-card border border-slate-700 rounded-2xl p-6 shadow-xl flex flex-col">
+          <div className="flex items-center justify-between mb-4 border-b border-slate-700 pb-3">
+            <h3 className="text-sm font-semibold text-chocolate-500 flex items-center gap-2">
+              <Layers size={16} className="text-orange-brand" /> Your Active Roadmaps
             </h3>
-            <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-xs font-mono">
+            <span className="px-2 py-0.5 rounded-full bg-cream-100 text-chocolate-400 text-xs font-mono border border-slate-700">
               {paths.length}
             </span>
           </div>
@@ -328,12 +328,12 @@ export const LearningPathsPage: React.FC = () => {
                     onClick={() => setSelectedPathIndex(idx)}
                     className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                       isSelected
-                        ? 'bg-blue-600/15 border-blue-500/60 shadow-inner'
-                        : 'bg-slate-950 border-slate-800/80 hover:border-slate-700'
+                        ? 'bg-orange-brand/10 border-orange-brand/50 shadow-inner'
+                        : 'bg-card border-slate-700 hover:border-orange-brand/40'
                     }`}
                   >
                     <div className="truncate pr-2">
-                      <div className="font-medium text-xs text-white truncate">{p.topic}</div>
+                      <div className="font-semibold text-xs text-chocolate-500 truncate">{p.topic}</div>
                       <div className="text-[11px] text-slate-400 flex items-center gap-2 mt-1">
                         <span>{p.nodes?.length || 0} Stages</span>
                         <span>•</span>
@@ -364,30 +364,30 @@ export const LearningPathsPage: React.FC = () => {
 
       {/* Main Roadmap Tree / Stages View */}
       {currentPath ? (
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 lg:p-8 shadow-2xl">
+        <div className="bg-card border border-slate-700 rounded-2xl p-6 lg:p-8 shadow-2xl">
           {/* Roadmap Header Banner */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800 mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-700 mb-8">
             <div>
-              <div className="flex items-center gap-2 text-blue-400 font-semibold text-xs uppercase mb-1">
+              <div className="flex items-center gap-2 text-orange-brand font-semibold text-xs uppercase mb-1">
                 <Compass size={16} /> Structured Learning Roadmap
               </div>
-              <h3 className="text-2xl font-bold text-white">{currentPath.topic}</h3>
-              <p className="text-slate-300 text-sm mt-1 max-w-3xl">{currentPath.description}</p>
+              <h3 className="text-2xl font-bold text-chocolate-500">{currentPath.topic}</h3>
+              <p className="text-chocolate-400 text-sm mt-1 max-w-3xl">{currentPath.description}</p>
             </div>
 
-            <div className="flex items-center gap-4 bg-slate-950 px-5 py-3 rounded-xl border border-slate-800 self-start md:self-auto">
+            <div className="flex items-center gap-4 bg-cream-100 px-5 py-3 rounded-xl border border-slate-700 self-start md:self-auto">
               <div className="text-right">
-                <span className="text-xs text-slate-400 block">Overall Mastery</span>
-                <span className="text-2xl font-bold text-cyan-400 font-mono">{currentPath.progress_percentage}%</span>
+                <span className="text-xs text-chocolate-400 block">Overall Mastery</span>
+                <span className="text-2xl font-bold text-orange-brand font-mono">{currentPath.progress_percentage}%</span>
               </div>
-              <div className="w-12 h-12 rounded-full border-4 border-slate-800 flex items-center justify-center relative">
+              <div className="w-12 h-12 rounded-full border-4 border-slate-700 flex items-center justify-center relative">
                 <div
-                  className="absolute inset-0 rounded-full border-4 border-cyan-400"
+                  className="absolute inset-0 rounded-full border-4 border-orange-brand"
                   style={{
                     clipPath: `polygon(50% 50%, -50% -50%, ${currentPath.progress_percentage * 2}% -50%)`,
                   }}
                 />
-                <GraduationCap size={18} className="text-slate-400" />
+                <GraduationCap size={18} className="text-chocolate-400" />
               </div>
             </div>
           </div>
@@ -404,43 +404,43 @@ export const LearningPathsPage: React.FC = () => {
                   key={node.id || idx}
                   className={`rounded-2xl border transition-all overflow-hidden ${
                     isCompleted
-                      ? 'bg-slate-950/70 border-emerald-500/30'
+                      ? 'bg-card border-emerald-500/30'
                       : isInProgress
-                      ? 'bg-slate-950 border-blue-500 shadow-lg shadow-blue-500/10'
-                      : 'bg-slate-950/40 border-slate-800/80 opacity-75'
+                      ? 'bg-card border-orange-brand shadow-lg shadow-orange-brand/10'
+                      : 'bg-card border-slate-700 opacity-75'
                   }`}
                 >
                   {/* Stage Top Bar */}
                   <div className={`px-6 py-3.5 border-b flex flex-wrap items-center justify-between gap-3 ${
                     isCompleted
-                      ? 'bg-emerald-950/20 border-emerald-900/40'
+                      ? 'bg-emerald-500/10 border-emerald-500/30'
                       : isInProgress
-                      ? 'bg-blue-950/30 border-blue-900/40'
-                      : 'bg-slate-900/40 border-slate-800'
+                      ? 'bg-orange-brand/10 border-orange-brand/30'
+                      : 'bg-cream-100 border-slate-700'
                   }`}>
                     <div className="flex items-center gap-3">
                       <div className="node-status-indicator">
-                        {isCompleted && <CheckCircle2 size={22} className="text-emerald-400" />}
-                        {isInProgress && <Circle size={22} className="text-blue-400 fill-blue-400/20" />}
+                        {isCompleted && <CheckCircle2 size={22} className="text-emerald-500" />}
+                        {isInProgress && <Circle size={22} className="text-orange-brand fill-orange-brand/20" />}
                         {isLocked && <Lock size={20} className="text-slate-500" />}
                       </div>
-                      <span className="font-semibold text-sm text-white">
+                      <span className="font-semibold text-sm text-chocolate-500">
                         {node.phase_name || `Stage ${idx + 1}`}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2.5">
                       {node.time_commitment && (
-                        <span className="px-2.5 py-1 rounded-md bg-slate-800 text-cyan-300 text-xs font-mono border border-slate-700">
+                        <span className="px-2.5 py-1 rounded-md bg-cream-100 text-chocolate-500 text-xs font-mono border border-slate-700">
                           ⏱ {node.time_commitment}
                         </span>
                       )}
                       <span className={`px-2.5 py-0.5 rounded-md text-xs font-semibold uppercase ${
                         node.difficulty === 'beginner'
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
                           : node.difficulty === 'advanced'
-                          ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                          : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                          ? 'bg-rose-500/10 text-rose-600 border border-rose-500/20'
+                          : 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
                       }`}>
                         {node.difficulty}
                       </span>
@@ -449,7 +449,7 @@ export const LearningPathsPage: React.FC = () => {
 
                   {/* Stage Main Body */}
                   <div className="p-6">
-                    <h4 className="text-lg font-bold text-white mb-2">{node.title}</h4>
+                    <h4 className="text-lg font-bold text-chocolate-500 mb-2">{node.title}</h4>
                     <p className="text-slate-300 text-sm mb-4 leading-relaxed">{node.description}</p>
 
                     {/* Core Concepts to Learn */}

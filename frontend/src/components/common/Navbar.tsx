@@ -54,7 +54,7 @@ export const Navbar: React.FC = () => {
           {/* Brand Logo */}
           <Link to="/dashboard" className="navbar-brand">
             <div className="brand-icon-box">
-              <GraduationCap size={24} className="text-blue-400" />
+              <GraduationCap size={24} className="text-[#CC5500]" />
             </div>
             <div className="brand-text-group">
               <span className="brand-title">EduMentor AI</span>
@@ -96,7 +96,7 @@ export const Navbar: React.FC = () => {
             {isAuthenticated ? (
               <div className="user-profile-menu">
                 <div className="user-avatar-pill">
-                  <UserIcon size={16} className="text-blue-400" />
+                  <UserIcon size={16} className="text-[#CC5500]" />
                   <span className="user-name">{user?.name || 'Learner'}</span>
                   <span className="user-lang-badge">{user?.preferred_language || 'en'}</span>
                 </div>

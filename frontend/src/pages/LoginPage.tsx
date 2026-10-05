@@ -43,7 +43,7 @@ export const LoginPage: React.FC = () => {
       <div className="auth-card">
         <div className="auth-header">
           <div className="auth-icon-badge">
-            <GraduationCap size={28} className="text-blue-400" />
+            <GraduationCap size={28} className="text-[#CC5500]" />
           </div>
           <h2>Welcome to EduMentor AI</h2>
           <p>Your personalized, adaptive AI teacher and mentor</p>
@@ -87,7 +87,7 @@ export const LoginPage: React.FC = () => {
         </form>
 
         {loading && (
-          <div className="text-xs text-center text-blue-300 animate-pulse my-2 bg-blue-500/10 py-2 px-3 rounded-lg border border-blue-500/20">
+          <div className="text-xs text-center text-[#CC5500] animate-pulse my-2 bg-orange-brand/10 py-2 px-3 rounded-lg border border-orange-brand/20">
             ⏳ Connecting to EduMentor AI backend... Please wait (Render free tier may take 15–30s if waking up from idle).
           </div>
         )}
@@ -96,15 +96,15 @@ export const LoginPage: React.FC = () => {
           type="button"
           onClick={handleDemoAccess}
           disabled={loading}
-          className="demo-credentials-banner w-full text-left cursor-pointer hover:bg-blue-600/20 transition-all border border-blue-500/40"
+          className="demo-credentials-banner w-full text-left cursor-pointer hover:bg-orange-brand/15 transition-all border border-orange-brand/40"
         >
           <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-1.5 font-semibold text-blue-300">
+            <div className="flex items-center gap-1.5 font-semibold text-[#CC5500]">
               <Sparkles size={14} /> Quick Demo Account (Click for Instant Access)
             </div>
-            <ArrowRight size={14} className="text-blue-400" />
+            <ArrowRight size={14} className="text-[#CC5500]" />
           </div>
-          <div className="text-xs text-slate-300">Student: <code>student@edumentor.ai</code> | Pass: <code>password123</code></div>
+          <div className="text-xs text-chocolate-400">Student: <code>student@edumentor.ai</code> | Pass: <code>password123</code></div>
         </button>
 
         <div className="auth-footer">

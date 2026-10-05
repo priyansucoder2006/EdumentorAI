@@ -96,7 +96,7 @@ export const YouTubeRecommendationModal: React.FC<YouTubeRecommendationModalProp
         {/* Scrollable Modal Content */}
         <div className="p-6 overflow-y-auto flex-1 space-y-4">
           <div>
-            <h3 className="text-xl font-bold text-white mb-1">Duration-Aware Video Recommendation</h3>
+            <h3 className="text-xl font-bold text-chocolate-500 mb-1">Duration-Aware Video Recommendation</h3>
             <p className="text-xs text-slate-400">
               Searches official YouTube Data API v3 and evaluates candidates to find <strong>EXACTLY ONE</strong> best learning video matching your topic and time limit.
             </p>

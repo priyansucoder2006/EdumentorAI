@@ -36,8 +36,8 @@ export const AvatarTeacher: React.FC<AvatarTeacherProps> = ({
 
       // 1. Soft Ambient Halo
       const gradient = ctx.createRadialGradient(centerX, centerY, 40, centerX, centerY, 140);
-      gradient.addColorStop(0, 'rgba(59, 130, 246, 0.25)');
-      gradient.addColorStop(1, 'rgba(15, 23, 42, 0)');
+      gradient.addColorStop(0, 'rgba(204, 85, 0, 0.2)');
+      gradient.addColorStop(1, 'rgba(248, 244, 231, 0)');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -45,12 +45,12 @@ export const AvatarTeacher: React.FC<AvatarTeacherProps> = ({
       const bobY = Math.sin(time * 1.5) * 3;
 
       // 2. Shoulders / Torso
-      ctx.fillStyle = '#1e293b';
+      ctx.fillStyle = '#4E342E';
       ctx.beginPath();
       ctx.ellipse(centerX, centerY + 120 + bobY, 75, 45, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = '#3b82f6';
+      ctx.fillStyle = '#CC5500';
       ctx.beginPath();
       ctx.ellipse(centerX, centerY + 135 + bobY, 40, 25, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -67,7 +67,7 @@ export const AvatarTeacher: React.FC<AvatarTeacherProps> = ({
       ctx.fill();
 
       // 5. Hair
-      ctx.fillStyle = '#334155';
+      ctx.fillStyle = '#382520';
       ctx.beginPath();
       ctx.arc(centerX, centerY - 15 + bobY, 56, Math.PI * 0.8, Math.PI * 2.2);
       ctx.fill();
@@ -130,7 +130,7 @@ export const AvatarTeacher: React.FC<AvatarTeacherProps> = ({
       ctx.stroke();
 
       // 8. Glasses (Intellectual teacher look)
-      ctx.strokeStyle = '#0284c7';
+      ctx.strokeStyle = '#CC5500';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(centerX - 20, centerY - 5 + bobY, 14, 0, Math.PI * 2);
@@ -158,12 +158,12 @@ export const AvatarTeacher: React.FC<AvatarTeacherProps> = ({
 
       // 10. Voice Audio Waves (when speaking)
       if (isSpeaking) {
-        ctx.strokeStyle = 'rgba(59, 130, 246, 0.7)';
+        ctx.strokeStyle = 'rgba(204, 85, 0, 0.7)';
         ctx.lineWidth = 2;
         for (let i = 0; i < 4; i++) {
           const waveRadius = 75 + i * 18 + ((time * 30) % 25);
           const alpha = Math.max(0, 1 - (waveRadius - 75) / 60);
-          ctx.strokeStyle = `rgba(59, 130, 246, ${alpha * 0.5})`;
+          ctx.strokeStyle = `rgba(204, 85, 0, ${alpha * 0.5})`;
           ctx.beginPath();
           ctx.arc(centerX, centerY + bobY, waveRadius, -Math.PI * 0.3, Math.PI * 0.3);
           ctx.stroke();
@@ -207,8 +207,8 @@ export const AvatarTeacher: React.FC<AvatarTeacherProps> = ({
         </div>
         {isSpeaking && (
           <div className="speaking-indicator">
-            <Volume2 size={16} className="pulse-icon text-blue-400" />
-            <span className="text-xs text-blue-400">Speaking...</span>
+            <Volume2 size={16} className="pulse-icon text-[#CC5500]" />
+            <span className="text-xs text-[#CC5500] font-semibold">Speaking...</span>
           </div>
         )}
       </div>

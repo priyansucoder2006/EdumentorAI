@@ -5,39 +5,39 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #0b0f19;
-  --bg-secondary: #111827;
-  --bg-card: #1e293b;
-  --bg-card-hover: #26354a;
-  --bg-glass: rgba(30, 41, 59, 0.7);
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-focus: #3b82f6;
+  --bg-primary: #F8F4E7;
+  --bg-secondary: #F0E8D7;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FFF9EE;
+  --bg-glass: rgba(248, 244, 231, 0.92);
+  --border-color: rgba(78, 52, 46, 0.14);
+  --border-focus: #CC5500;
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #4E342E;
+  --text-secondary: #6D4C41;
+  --text-muted: #8D6E63;
 
-  --blue-primary: #3b82f6;
-  --blue-hover: #2563eb;
-  --blue-glow: rgba(59, 130, 246, 0.35);
+  --blue-primary: #CC5500;
+  --blue-hover: #B34700;
+  --blue-glow: rgba(204, 85, 0, 0.25);
 
-  --emerald-primary: #10b981;
-  --emerald-glow: rgba(16, 185, 129, 0.3);
+  --emerald-primary: #2E7D32;
+  --emerald-glow: rgba(46, 125, 50, 0.25);
 
-  --amber-primary: #f59e0b;
-  --amber-glow: rgba(245, 158, 11, 0.3);
+  --amber-primary: #D97706;
+  --amber-glow: rgba(217, 119, 6, 0.25);
 
-  --rose-primary: #f43f5e;
-  --purple-primary: #a855f7;
+  --rose-primary: #C62828;
+  --purple-primary: #8E24AA;
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
   --radius-xl: 24px;
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 2px 8px rgba(78, 52, 46, 0.06);
+  --shadow-md: 0 4px 20px rgba(78, 52, 46, 0.08);
+  --shadow-lg: 0 10px 30px rgba(78, 52, 46, 0.12);
 
   --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -91,10 +91,10 @@ code, pre {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-card);
+  background: #D7CCC8;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: #A1887F;
 }

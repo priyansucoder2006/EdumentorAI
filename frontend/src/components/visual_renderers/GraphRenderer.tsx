@@ -51,17 +51,17 @@ export const GraphRenderer: React.FC<GraphRendererProps> = ({
           <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorY" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05} />
+                <stop offset="5%" stopColor="#CC5500" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#CC5500" stopOpacity={0.05} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="x" stroke="#94a3b8" label={{ value: xLabel, position: 'insideBottomRight', offset: -5 }} />
-            <YAxis stroke="#94a3b8" label={{ value: yLabel, angle: -90, position: 'insideLeft' }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(78,52,46,0.12)" />
+            <XAxis dataKey="x" stroke="#6D4C41" label={{ value: xLabel, position: 'insideBottomRight', offset: -5 }} />
+            <YAxis stroke="#6D4C41" label={{ value: yLabel, angle: -90, position: 'insideLeft' }} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', borderRadius: '8px', color: '#f8fafc' }}
+              contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#EAE1D2', borderRadius: '8px', color: '#4E342E' }}
             />
-            <Area type="monotone" dataKey="y" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorY)" />
+            <Area type="monotone" dataKey="y" stroke="#CC5500" strokeWidth={2} fillOpacity={1} fill="url(#colorY)" />
           </AreaChart>
         </ResponsiveContainer>
       </div>
