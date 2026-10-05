@@ -54,7 +54,7 @@ export const Navbar: React.FC = () => {
           {/* Brand Logo */}
           <Link to="/dashboard" className="navbar-brand">
             <div className="brand-icon-box">
-              <GraduationCap size={24} className="text-[#CC5500]" />
+              <img src="/icon-transparent.png" alt="EduMentor AI" className="w-7 h-7 object-contain drop-shadow-sm" />
             </div>
             <div className="brand-text-group">
               <span className="brand-title">EduMentor AI</span>

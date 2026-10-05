@@ -39,8 +39,12 @@ export const RegisterPage: React.FC = () => {
     <div className="auth-page-wrapper">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="auth-icon-badge">
-            <GraduationCap size={28} className="text-[#CC5500]" />
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/icon-transparent.png" 
+              alt="EduMentor AI" 
+              className="w-20 h-20 object-contain drop-shadow-md hover:scale-105 transition-transform duration-300" 
+            />
           </div>
           <h2>Join EduMentor AI</h2>
           <p>Set up your profile to start personalized adaptive learning</p>

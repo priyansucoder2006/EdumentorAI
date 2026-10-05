@@ -93,8 +93,8 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="dashboard-page-container">
       {/* Welcome Banner */}
-      <section className="dashboard-welcome-hero">
-        <div className="welcome-content">
+      <section className="dashboard-welcome-hero flex flex-col lg:flex-row items-center justify-between gap-6">
+        <div className="welcome-content flex-1">
           <div className="flex items-center gap-2 text-blue-300 font-semibold text-sm mb-1">
             <Sparkles size={16} /> Adaptive Learning Center
           </div>
@@ -128,6 +128,9 @@ export const DashboardPage: React.FC = () => {
               <ArrowRight size={16} />
             </button>
           </form>
+        </div>
+        <div className="hidden lg:flex flex-col items-center justify-center p-3 bg-white/40 rounded-2xl border border-[rgba(78,52,46,0.12)] shadow-sm shrink-0">
+          <img src="/icon-transparent.png" alt="EduMentor Mascot" className="w-28 h-28 object-contain drop-shadow-md hover:scale-105 transition-transform duration-300" />
         </div>
       </section>
 
