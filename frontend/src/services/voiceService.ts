@@ -13,10 +13,11 @@ export class VoiceService {
   private preferredVoiceName: string | null = null;
   private preferredRate: number = 0.98;
   private preferredPitch: number = 1.05;
+  private voicesChangedListeners: Array<() => void> = [];
 
   constructor() {
     if (typeof window !== 'undefined') {
-      // Speech recognition
+      // Speech recognition setup
       const SpeechRecognition =
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
@@ -33,10 +34,10 @@ export class VoiceService {
         const savedPitch = localStorage.getItem('edumentor_voice_pitch');
         if (savedPitch) this.preferredPitch = parseFloat(savedPitch) || 1.05;
       } catch (e) {
-        // ignore
+        // ignore storage errors
       }
 
-      // Load voices
+      // Initialize speech synthesis voices
       this.initVoices();
     }
   }
@@ -45,18 +46,47 @@ export class VoiceService {
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
 
     const loadVoices = () => {
-      this.voices = window.speechSynthesis.getVoices();
+      const v = window.speechSynthesis.getVoices();
+      if (v && v.length > 0) {
+        this.voices = v;
+        this.voicesChangedListeners.forEach((cb) => {
+          try {
+            cb();
+          } catch {}
+        });
+      }
     };
 
     loadVoices();
+
+    // Standard event listener
+    try {
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    } catch {}
+
+    // Fallback property assignment
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
       window.speechSynthesis.onvoiceschanged = loadVoices;
     }
+
+    // Chrome async recovery check
+    setTimeout(loadVoices, 300);
+    setTimeout(loadVoices, 1000);
+  }
+
+  public subscribeVoicesChanged(callback: () => void): () => void {
+    this.voicesChangedListeners.push(callback);
+    return () => {
+      this.voicesChangedListeners = this.voicesChangedListeners.filter((cb) => cb !== callback);
+    };
   }
 
   public getAvailableVoices(): SpeechSynthesisVoice[] {
-    if (this.voices.length === 0 && typeof window !== 'undefined' && window.speechSynthesis) {
-      this.voices = window.speechSynthesis.getVoices();
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      const live = window.speechSynthesis.getVoices();
+      if (live && live.length > 0) {
+        this.voices = live;
+      }
     }
     return this.voices;
   }
@@ -95,24 +125,55 @@ export class VoiceService {
   }
 
   /**
+   * Retrieves user-selected voice for a specific language (e.g. 'en', 'bn', 'hi')
+   */
+  public getPreferredVoiceForLanguage(language: string = 'en'): string | null {
+    const langKey = language.toLowerCase().split('-')[0];
+    try {
+      const specific = localStorage.getItem(`edumentor_voice_name_${langKey}`);
+      if (specific) return specific;
+    } catch {}
+    return this.preferredVoiceName;
+  }
+
+  /**
+   * Sets preferred voice for a specific language
+   */
+  public setPreferredVoiceForLanguage(language: string = 'en', voiceName: string | null) {
+    const langKey = language.toLowerCase().split('-')[0];
+    try {
+      if (voiceName) {
+        localStorage.setItem(`edumentor_voice_name_${langKey}`, voiceName);
+        localStorage.setItem('edumentor_voice_name', voiceName);
+        this.preferredVoiceName = voiceName;
+      } else {
+        localStorage.removeItem(`edumentor_voice_name_${langKey}`);
+      }
+    } catch {}
+  }
+
+  /**
+   * Clears saved preference for language
+   */
+  public clearPreferredVoiceForLanguage(language: string = 'en') {
+    const langKey = language.toLowerCase().split('-')[0];
+    try {
+      localStorage.removeItem(`edumentor_voice_name_${langKey}`);
+    } catch {}
+  }
+
+  /**
    * Intelligently selects the most appropriate, natural-sounding voice for Prof. Elena.
-   * Strictly avoids harsh, robotic male voices (e.g. Microsoft David) and prioritizes
-   * natural, articulate female educational voices.
+   * Isolates voices by language to prevent silent/garbled playback across language switches.
    */
   public selectBestVoice(language: string = 'en'): SpeechSynthesisVoice | null {
     const allVoices = this.getAvailableVoices();
     if (allVoices.length === 0) return null;
 
-    // 1. If user explicitly chose a voice, try to respect it
-    if (this.preferredVoiceName) {
-      const explicit = allVoices.find((v) => v.name === this.preferredVoiceName);
-      if (explicit) return explicit;
-    }
+    const langLower = (language || 'en').toLowerCase().trim();
+    const langPrefix = langLower.split('-')[0];
 
-    const langLower = language.toLowerCase();
-    const isBengali = langLower === 'bn' || langLower.startsWith('bn');
-
-    // List of known robotic or male voices to strictly deprioritize
+    // Helper functions for voice attributes
     const isRoboticOrMale = (name: string): boolean => {
       const n = name.toLowerCase();
       return (
@@ -126,7 +187,6 @@ export class VoiceService {
       );
     };
 
-    // Female indicator
     const isFemale = (name: string): boolean => {
       const n = name.toLowerCase();
       return (
@@ -141,32 +201,60 @@ export class VoiceService {
         n.includes('elena') ||
         n.includes('siri') ||
         n.includes('tanishaa') ||
+        n.includes('swara') ||
         n.includes('natural')
       );
     };
 
-    // Case 1: Bengali (বাংলা)
-    if (isBengali) {
+    const isVoiceMatchingLang = (v: SpeechSynthesisVoice, prefix: string): boolean => {
+      const vl = v.lang.toLowerCase();
+      const vn = v.name.toLowerCase();
+      if (prefix === 'bn') {
+        return vl.startsWith('bn') || vn.includes('bengali') || vn.includes('bangla');
+      }
+      if (prefix === 'hi') {
+        return vl.startsWith('hi') || vn.includes('hindi');
+      }
+      if (prefix === 'en') {
+        return vl.startsWith('en');
+      }
+      return vl.startsWith(prefix);
+    };
+
+    // 1. Check user preference for this language
+    const preferredName = this.getPreferredVoiceForLanguage(language);
+    if (preferredName) {
+      const explicit = allVoices.find((v) => v.name === preferredName);
+      // Validate that this explicit voice actually supports the requested language
+      if (explicit && isVoiceMatchingLang(explicit, langPrefix)) {
+        return explicit;
+      }
+    }
+
+    // 2. Language-specific matching
+    if (langPrefix === 'bn') {
+      // Bengali
       const bengaliFemale = allVoices.find(
-        (v) => (v.lang.startsWith('bn') || v.name.toLowerCase().includes('bengali') || v.name.toLowerCase().includes('bangla')) && isFemale(v.name)
+        (v) => isVoiceMatchingLang(v, 'bn') && isFemale(v.name)
       );
       if (bengaliFemale) return bengaliFemale;
 
-      const bengaliVoice = allVoices.find(
-        (v) => v.lang.startsWith('bn') || v.name.toLowerCase().includes('bengali') || v.name.toLowerCase().includes('bangla')
+      const bengaliAny = allVoices.find((v) => isVoiceMatchingLang(v, 'bn'));
+      if (bengaliAny) return bengaliAny;
+    } else if (langPrefix === 'hi') {
+      // Hindi
+      const hindiFemale = allVoices.find(
+        (v) => isVoiceMatchingLang(v, 'hi') && isFemale(v.name)
       );
-      if (bengaliVoice) return bengaliVoice;
+      if (hindiFemale) return hindiFemale;
+
+      const hindiAny = allVoices.find((v) => isVoiceMatchingLang(v, 'hi'));
+      if (hindiAny) return hindiAny;
     }
 
-    // Case 2: English (Default) - Prioritize natural female voices for Prof. Elena
-    // Priority order:
-    // 1. Microsoft Aria Online (Natural)
-    // 2. Microsoft Jenny Online (Natural)
-    // 3. Google UK English Female / Google US English
-    // 4. Samantha (macOS)
-    // 5. Microsoft Zira (Windows default female)
-    // 6. Any female English voice
-    const topPicks = [
+    // 3. English or general fallback
+    // Priority list for Prof. Elena:
+    const topEnglishPicks = [
       (v: SpeechSynthesisVoice) => v.name.includes('Aria') && v.name.includes('Natural'),
       (v: SpeechSynthesisVoice) => v.name.includes('Jenny') && v.name.includes('Natural'),
       (v: SpeechSynthesisVoice) => v.name.toLowerCase().includes('uk english female'),
@@ -178,12 +266,18 @@ export class VoiceService {
       (v: SpeechSynthesisVoice) => v.lang.startsWith('en') && !isRoboticOrMale(v.name),
     ];
 
-    for (const matcher of topPicks) {
-      const match = allVoices.find(matcher);
-      if (match) return match;
+    if (langPrefix === 'en') {
+      for (const matcher of topEnglishPicks) {
+        const match = allVoices.find(matcher);
+        if (match) return match;
+      }
+    } else {
+      // Check for any voice in target language
+      const langMatch = allVoices.find((v) => isVoiceMatchingLang(v, langPrefix) && !isRoboticOrMale(v.name));
+      if (langMatch) return langMatch;
     }
 
-    // Absolute fallback: first non-robotic voice or default
+    // Fallback: first non-robotic voice or first available
     return allVoices.find((v) => !isRoboticOrMale(v.name)) || allVoices[0] || null;
   }
 
@@ -229,13 +323,13 @@ export class VoiceService {
     clean = clean.replace(/\\Delta/g, ' delta ');
     clean = clean.replace(/\\[a-zA-Z]+/g, ' ');
 
-    // 4. Remove emojis and unwanted symbols
+    // 4. Remove emojis
     clean = clean.replace(
       /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu,
       ''
     );
 
-    // 5. Normalize whitespace and punctuation pauses
+    // 5. Normalize whitespace
     clean = clean.replace(/\s+/g, ' ').trim();
 
     return clean;
@@ -243,6 +337,76 @@ export class VoiceService {
 
   public setSpeakingListener(cb: (speaking: boolean) => void) {
     this.onSpeakingChangeCallback = cb;
+  }
+
+  public getIsSpeaking(): boolean {
+    return this.isSpeaking;
+  }
+
+  /**
+   * Audition / preview a specific voice immediately with an appropriate native greeting
+   */
+  public previewVoice(
+    voice: SpeechSynthesisVoice,
+    sampleText?: string,
+    onEnd?: () => void
+  ) {
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      if (onEnd) onEnd();
+      return;
+    }
+
+    this.stopSpeaking();
+
+    const isBengali =
+      voice.lang.toLowerCase().startsWith('bn') ||
+      voice.name.toLowerCase().includes('bengali') ||
+      voice.name.toLowerCase().includes('bangla');
+    const isHindi = voice.lang.toLowerCase().startsWith('hi');
+
+    let text = sampleText;
+    if (!text) {
+      if (isBengali) {
+        text = "নমস্কার! আমি প্রফেসর এলেনা, আপনার এআই শিক্ষিকা।";
+      } else if (isHindi) {
+        text = "नमस्ते! मैं प्रोफेसर एलेना हूँ, आपकी AI शिक्षिका।";
+      } else {
+        text = "Hello! I am Professor Elena, your adaptive AI teacher.";
+      }
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.voice = voice;
+    utterance.lang = voice.lang;
+    utterance.rate = this.preferredRate;
+    utterance.pitch = this.preferredPitch;
+
+    utterance.onstart = () => {
+      this.isSpeaking = true;
+      if (this.onSpeakingChangeCallback) this.onSpeakingChangeCallback(true);
+    };
+
+    const cleanup = () => {
+      this.isSpeaking = false;
+      if (this.onSpeakingChangeCallback) this.onSpeakingChangeCallback(false);
+      if (onEnd) onEnd();
+    };
+
+    utterance.onend = cleanup;
+    utterance.onerror = cleanup;
+
+    // Small delay to ensure browser cancel queue is resolved
+    setTimeout(() => {
+      try {
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {
+        console.warn('Voice preview error:', e);
+        cleanup();
+      }
+    }, 25);
   }
 
   public speak(text: string, language: string = 'en', onEnd?: () => void) {
@@ -261,16 +425,17 @@ export class VoiceService {
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
 
-    // 1. Dynamically select the best natural female voice
+    // 1. Dynamically select the best natural voice for the target language
     const bestVoice = this.selectBestVoice(language);
     if (bestVoice) {
       utterance.voice = bestVoice;
       utterance.lang = bestVoice.lang;
     } else {
-      // Fallback language tag
       const langLower = language.toLowerCase();
       if (langLower === 'bn' || langLower.startsWith('bn')) {
         utterance.lang = 'bn-IN';
+      } else if (langLower === 'hi' || langLower.startsWith('hi')) {
+        utterance.lang = 'hi-IN';
       } else {
         utterance.lang = 'en-US';
       }
@@ -308,7 +473,6 @@ export class VoiceService {
     };
 
     utterance.onerror = (e) => {
-      // SpeechSynthesis cancel generates an 'interrupted' error which is expected
       if (e.error !== 'interrupted' && e.error !== 'canceled') {
         console.warn('TTS utterance error:', e);
       }
@@ -316,25 +480,42 @@ export class VoiceService {
       if (onEnd) onEnd();
     };
 
-    try {
-      window.speechSynthesis.speak(utterance);
-    } catch (e) {
-      console.warn('Error invoking speechSynthesis.speak:', e);
-      cleanup();
-      if (onEnd) onEnd();
-    }
+    // Chrome race condition protection: schedule speech after cancel
+    setTimeout(() => {
+      try {
+        if (typeof window !== 'undefined' && window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {
+        console.warn('Error invoking speechSynthesis.speak:', e);
+        cleanup();
+        if (onEnd) onEnd();
+      }
+    }, 25);
   }
 
-  public testVoice(sampleText?: string, language: string = 'en') {
-    const text =
-      sampleText ||
-      "Hello! I am Professor Elena, your adaptive AI teacher. I'm calibrated to explain concepts step by step with interactive checks. Let's master this topic together!";
-    this.speak(text, language);
+  public testVoice(sampleText?: string, language: string = 'en', onEnd?: () => void) {
+    const langLower = (language || 'en').toLowerCase();
+    let text = sampleText;
+    if (!text) {
+      if (langLower.startsWith('bn')) {
+        text = "নমস্কার! আমি প্রফেসর এলেনা, আপনার এআই শিক্ষিকা। চলুন বিষয়টি একসাথে নিখুঁতভাবে শিখি!";
+      } else if (langLower.startsWith('hi')) {
+        text = "नमस्ते! मैं प्रोफेसर एलेना हूँ, आपकी AI शिक्षिका। चलिए इस विषय को एक साथ सीखते हैं!";
+      } else {
+        text = "Hello! I am Professor Elena, your adaptive AI teacher. I'm calibrated to explain concepts step by step with interactive checks. Let's master this topic together!";
+      }
+    }
+    this.speak(text, language, onEnd);
   }
 
   public stopSpeaking() {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       window.speechSynthesis.cancel();
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
       this.isSpeaking = false;
       if (this.keepAliveInterval) {
         clearInterval(this.keepAliveInterval);
@@ -357,6 +538,8 @@ export class VoiceService {
     const langLower = language.toLowerCase();
     if (langLower === 'bn' || langLower.startsWith('bn')) {
       this.recognition.lang = 'bn-IN';
+    } else if (langLower === 'hi' || langLower.startsWith('hi')) {
+      this.recognition.lang = 'hi-IN';
     } else {
       this.recognition.lang = 'en-US';
     }
@@ -392,4 +575,5 @@ export class VoiceService {
 }
 
 export const voiceManager = new VoiceService();
+
 
